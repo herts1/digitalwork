@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE circuit SYSTEM "http://www.cburch.com/logisim/xml/circuit.dtd">
+<circuit>
+  <a name="main" loc="(0,0)" width="300" height="200" visible="true" current="true">
+    <label loc="(150,20)" text="Simple AND Circuit" align="center" valign="middle" color="#000000" size="18" bold="true" italic="false" underline="false" font="SansSerif" />
+    <input loc="(50,50)" name="A" label="A" labelLocation="west" size="1" />
+    <input loc="(50,100)" name="B" label="B" labelLocation="west" size="1" />
+    <gate loc="(150,75)" type="and" size="1" />
+    <output loc="(250,75)" name="Output" label="Output" labelLocation="east" size="1" />
+    <wire from="(70,50)" to="(130,50)" />
+    <wire from="(130,50)" to="(130,75)" />
+    <wire from="(70,100)" to="(130,100)" />
+    <wire from="(130,100)" to="(130,75)" />
+    <wire from="(170,75)" to="(230,75)" />
+  </a>
+</circuit>
