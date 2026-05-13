@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>4位倒计时寄存器（Logisim风格）</title>
+<style>
+body {
+    background:#f4f6f8;
+    font-family:"Segoe UI", sans-serif;
+}
+svg { background:#ffffff; border:1px solid #ccc; }
+button {
+    margin:5px;
+    padding:6px 14px;
+    font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>4位倒计时寄存器（0 → 9 循环）</h2>
+
+<svg id="circuit" width="900" height="520"></svg>
+
+<div>
+    <button onclick="resetCircuit()">RST（复位）</button>
+    <button onclick="clockStep()">CLK（单步）</button>
+</div>
+
+<script>
+const svg = document.getElementById("circuit");
+
+/* ========== 状态 ========== */
+let Q = [0,0,0,0];          // Q3 Q2 Q1 Q0
+let clock = 0;
+
+/* ========== SVG 工具 ========== */
+function drawRect(x,y,w,h,label){
+    svg.innerHTML += `
+        <rect x="${x}" y="${y}" width="${w}" height="${h}"
+              stroke="#333" fill="#e8f0fe" rx="6"/>
+        <text x="${x+w/2}" y="${y+h/2+5}" text-anchor="middle"
+              font-size="13">${label}</text>`;
+}
+
+function drawWire(p1,p2){
+    svg.innerHTML += `
+        <line x1="${p1[0]}" y1="${p1[1]}"
+              x2="${p2[0]}" y2="${p2[1]}"
+              stroke="#222" stroke-width="2"/>`;
+}
+
+function drawBus(points,label){
+    for(let i=0;i<points.length-1;i++){
+        drawWire(points[i],points[i+1]);
+    }
+    if(label){
+        let p = points[Math.floor(points.length/2)];
+        svg.innerHTML += `<text x="${p[0]+10}" y="${p[1]-6}"
+                         font-size="11" fill="#555">${label}</text>`;
+    }
+}
+
+/* ========== 器件布局 ========== */
+// 寄存器
+drawRect(600,180,120,140,"4位寄存器\n(D触发器)");
+
+// 减法器
+drawRect(420,200,110,100,"减法器\nQ - 1");
+
+// 比较器
+drawRect(420,350,110,80,"比较器\nQ==0");
+
+// MUX
+drawRect(520,260,90,100,"MUX\n2:1");
+
+// 按钮
+drawRect(150,300,80,50,"RST");
+drawRect(150,380,80,50,"CLK");
+
+// 数码管
+drawRect(750,200,90,100,"7段数码管");
+
+/* ========== 连线 ========== */
+
+// 寄存器 → 减法器 & 比较器
+drawBus([[600,220],[420,220]],"Q");
+drawBus([[600,280],[420,370]],"Q");
+
+// 减法器 → MUX(0)
+drawBus([[530,220],[520,280]],"Sub");
+
+// 比较器 → MUX(Sel)
+drawBus([[530,390],[520,310]],"Is0");
+
+// MUX → 寄存器
+drawBus([[610,260],[720,260],[720,240],[600,240]],"D");
+
+// 常数 0001
+svg.innerHTML += `<text x="350" y="250">0001</text>`;
+drawBus([[350,250],[420,250]]);
+
+// 常数 1001
+svg.innerHTML += `<text x="450" y="240">1001</text>`;
+drawBus([[450,240],[520,240]]);
+
+// 寄存器 → 数码管
+drawBus([[720,220],[750,220]],"Q");
+
+// RST → 寄存器 CLR
+drawBus([[230,325],[600,325],[600,180]]);
+
+// CLK → 寄存器 CLK
+drawBus([[230,405],[600,405],[600,320]]);
+
+/* ========== 逻辑仿真 ========== */
+function binToDec(b){
+    return b[0]*8 + b[1]*4 + b[2]*2 + b[3];
+}
+function decToBin(d){
+    return d.toString(2).padStart(4,'0').split('').map(Number);
+}
+
+function resetCircuit(){
+    Q = [0,0,0,0];
+    updateDisplay();
+}
+
+function clockStep(){
+    clock ^= 1;
+    if(clock !== 1) return; // 上升沿
+
+    const val = binToDec(Q);
+    const isZero = val === 0;
+    const next = isZero ? 9 : val - 1;
+
+    Q = decToBin(next);
+    updateDisplay();
+}
+
+function updateDisplay(){
+    svg.querySelectorAll(".seg").forEach(e=>e.remove());
+
+    const val = binToDec(Q);
+    const segMap = [
+        [1,1,1,1,1,1,0],
+        [0,1,1,0,0,0,0],
+        [1,1,0,1,1,0,1],
+        [1,1,1,1,0,0,1],
+        [0,1,1,0,0,1,1],
+        [1,0,1,1,0,1,1],
+        [1,0,1,1,1,1,1],
+        [1,1,1,0,0,0,0],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,0,1,1]
+    ][val];
+
+    const baseX = 760;
+    const baseY = 210;
+
+    const segments = [
+        [baseX+15,baseY+10,baseX+45,baseY+10],
+        [baseX+50,baseY+15,baseX+50,baseY+45],
+        [baseX+50,baseY+55,baseX+50,baseY+85],
+        [baseX+15,baseY+90,baseX+45,baseY+90],
+        [baseX+10,baseY+55,baseX+10,baseY+85],
+        [baseX+10,baseY+15,baseX+10,baseY+45],
+        [baseX+15,baseY+50,baseX+45,baseY+50]
+    ];
+
+    segments.forEach((s,i)=>{
+        if(segMap[i]){
+            svg.innerHTML += `
+                <line class="seg"
+                      x1="${s[0]}" y1="${s[1]}"
+                      x2="${s[2]}" y2="${s[3]}"
+                      stroke="red" stroke-width="4"/>`;
+        }
+    });
+}
+</script>
+
+</body>
+</html>

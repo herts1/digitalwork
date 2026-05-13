@@ -264,12 +264,17 @@
     <a name="circuit" val="ShiftRegister"/>
     <a name="circuitnamedboxfixedsize" val="true"/>
     <a name="simulationFrequency" val="1.0"/>
-    <comp lib="0" loc="(150,130)" name="Clock">
-      <a name="label" val="CLK"/>
-    </comp>
-    <comp lib="0" loc="(170,150)" name="Pin">
+    <comp lib="0" loc="(110,330)" name="Pin">
       <a name="appearance" val="NewPins"/>
       <a name="label" val="Din"/>
+      <a name="width" val="4"/>
+    </comp>
+    <comp lib="0" loc="(120,330)" name="Splitter">
+      <a name="fanout" val="4"/>
+      <a name="incoming" val="4"/>
+    </comp>
+    <comp lib="0" loc="(150,130)" name="Clock">
+      <a name="label" val="CLK"/>
     </comp>
     <comp lib="5" loc="(570,130)" name="LED"/>
     <comp lib="5" loc="(570,230)" name="LED"/>
@@ -279,16 +284,28 @@
     <comp loc="(490,230)" name="DFlipFlop"/>
     <comp loc="(490,330)" name="DFlipFlop"/>
     <comp loc="(490,430)" name="DFlipFlop"/>
+    <wire from="(110,330)" to="(120,330)"/>
+    <wire from="(140,150)" to="(140,290)"/>
+    <wire from="(140,150)" to="(270,150)"/>
+    <wire from="(140,300)" to="(200,300)"/>
+    <wire from="(140,310)" to="(240,310)"/>
+    <wire from="(140,320)" to="(200,320)"/>
     <wire from="(150,130)" to="(260,130)"/>
-    <wire from="(170,150)" to="(270,150)"/>
-    <wire from="(240,200)" to="(240,250)"/>
+    <wire from="(200,220)" to="(200,300)"/>
+    <wire from="(200,220)" to="(240,220)"/>
+    <wire from="(200,320)" to="(200,430)"/>
+    <wire from="(200,430)" to="(240,430)"/>
+    <wire from="(240,200)" to="(240,220)"/>
     <wire from="(240,200)" to="(520,200)"/>
+    <wire from="(240,220)" to="(240,250)"/>
     <wire from="(240,250)" to="(270,250)"/>
-    <wire from="(240,300)" to="(240,350)"/>
+    <wire from="(240,300)" to="(240,310)"/>
     <wire from="(240,300)" to="(520,300)"/>
+    <wire from="(240,310)" to="(240,350)"/>
     <wire from="(240,350)" to="(270,350)"/>
-    <wire from="(240,400)" to="(240,450)"/>
+    <wire from="(240,400)" to="(240,430)"/>
     <wire from="(240,400)" to="(520,400)"/>
+    <wire from="(240,430)" to="(240,450)"/>
     <wire from="(240,450)" to="(270,450)"/>
     <wire from="(260,130)" to="(260,230)"/>
     <wire from="(260,130)" to="(270,130)"/>
@@ -806,7 +823,7 @@
     <comp lib="8" loc="(325,530)" name="Text">
       <a name="text" val="2、介绍时钟、频率；介绍怎么把模块符号变小"/>
     </comp>
-    <comp lib="8" loc="(384,595)" name="Text">
+    <comp lib="8" loc="(380,595)" name="Text">
       <a name="text" val="4、介绍重置仿真：软件使用出现问题时，“模拟”--&gt;“重置仿真”"/>
     </comp>
     <comp lib="8" loc="(470,395)" name="Text">
