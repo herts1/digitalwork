@@ -307,7 +307,6 @@
     <a name="circuitnamedboxfixedsize" val="true"/>
     <a name="simulationFrequency" val="2.0"/>
     <comp lib="0" loc="(390,220)" name="Constant">
-      <a name="value" val="0xf"/>
       <a name="width" val="4"/>
     </comp>
     <comp lib="0" loc="(390,350)" name="Constant">
