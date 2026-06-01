@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project source="3.8.0" version="1.0">
+  This file is intended to be loaded by Logisim-evolution v3.8.0(https://github.com/logisim-evolution/).
+
+  <lib desc="#Wiring" name="0">
+    <tool name="Pin">
+      <a name="appearance" val="classic"/>
+    </tool>
+  </lib>
+  <lib desc="#Gates" name="1"/>
+  <lib desc="#Plexers" name="2"/>
+  <lib desc="#Arithmetic" name="3"/>
+  <lib desc="#Memory" name="4"/>
+  <lib desc="#I/O" name="5"/>
+  <lib desc="#TTL" name="6"/>
+  <lib desc="#TCL" name="7"/>
+  <lib desc="#Base" name="8"/>
+  <lib desc="#BFH-Praktika" name="9"/>
+  <lib desc="#Input/Output-Extra" name="10"/>
+  <lib desc="#Soc" name="11"/>
+  <main name="main"/>
+  <options>
+    <a name="gateUndefined" val="ignore"/>
+    <a name="simlimit" val="1000"/>
+    <a name="simrand" val="0"/>
+  </options>
+  <mappings>
+    <tool lib="8" map="Button2" name="Poke Tool"/>
+    <tool lib="8" map="Button3" name="Menu Tool"/>
+    <tool lib="8" map="Ctrl Button1" name="Menu Tool"/>
+  </mappings>
+  <toolbar>
+    <tool lib="8" name="Poke Tool"/>
+    <tool lib="8" name="Edit Tool"/>
+    <tool lib="8" name="Wiring Tool"/>
+    <tool lib="8" name="Text Tool"/>
+    <sep/>
+    <tool lib="0" name="Pin"/>
+    <tool lib="0" name="Pin">
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+    </tool>
+    <sep/>
+    <tool lib="1" name="NOT Gate"/>
+    <tool lib="1" name="AND Gate"/>
+    <tool lib="1" name="OR Gate"/>
+    <tool lib="1" name="XOR Gate"/>
+    <tool lib="1" name="NAND Gate"/>
+    <tool lib="1" name="NOR Gate"/>
+    <sep/>
+    <tool lib="4" name="D Flip-Flop"/>
+    <tool lib="4" name="Register"/>
+  </toolbar>
+  <circuit name="main">
+    <a name="appearance" val="logisim_evolution"/>
+    <a name="circuit" val="main"/>
+    <a name="circuitnamedboxfixedsize" val="true"/>
+    <a name="simulationFrequency" val="1.0"/>
+  </circuit>
+  <circuit name="sequence_detector_testbench">
+    <a name="appearance" val="logisim_evolution"/>
+    <a name="circuit" val="sequence_detector_testbench"/>
+    <a name="circuitnamedboxfixedsize" val="true"/>
+    <a name="simulationFrequency" val="4.0"/>
+    <comp lib="0" loc="(260,290)" name="Clock"/>
+    <comp lib="0" loc="(280,310)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(280,330)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="5" loc="(650,290)" name="LED"/>
+    <comp lib="5" loc="(650,340)" name="LED">
+      <a name="color" val="#1df023"/>
+    </comp>
+    <comp lib="8" loc="(445,405)" name="Text">
+      <a name="text" val="注意：这个设计用的是低电平复位，所以要先将rst_n的输入置为高电平‘1’，退出复位"/>
+    </comp>
+    <comp loc="(570,290)" name="sequence_detector">
+      <a name="appearance" val="logisim_evolution"/>
+    </comp>
+    <wire from="(260,290)" to="(350,290)"/>
+    <wire from="(280,310)" to="(350,310)"/>
+    <wire from="(280,330)" to="(350,330)"/>
+    <wire from="(570,290)" to="(650,290)"/>
+    <wire from="(570,310)" to="(610,310)"/>
+    <wire from="(610,310)" to="(610,340)"/>
+    <wire from="(610,340)" to="(650,340)"/>
+  </circuit>
+  <vhdl name="sequence_detector">library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- 序列检测模块：检测010(short_push)、111(long_push)
+entity sequence_detector is
+    Port (
+        clk     : in  STD_LOGIC;           -- 时钟信号，周期T
+        rst_n   : in  STD_LOGIC;           -- 低电平复位信号
+        din     : in  STD_LOGIC;           -- 二进制输入序列
+        short_push : out STD_LOGIC;        -- 检测到010输出高
+        long_push  : out STD_LOGIC         -- 检测到111输出高
+    );
+end sequence_detector;
+
+architecture Behavioral of sequence_detector is
+    -- 状态定义
+    type state_type is (IDLE, S0, S01, S1, S11, S010, S111);
+    signal current_state : state_type;  -- 当前状态
+    signal next_state    : state_type;  -- 下一个状态
+
+begin
+
+    -- 第一段：时序逻辑，状态寄存器（同步时钟更新）
+    process(clk, rst_n)
+    begin
+        if rst_n = '0' then           -- 异步复位，优先于时钟
+            current_state &lt;= IDLE;
+        elsif rising_edge(clk) then   -- 时钟上升沿更新状态
+            current_state &lt;= next_state;
+        end if;
+    end process;
+
+    -- 第二段：组合逻辑，状态转移逻辑（根据当前状态+输入决定下一个状态）
+    process(current_state, din)
+    begin
+        case current_state is
+            when IDLE =&gt;
+                if din = '0' then
+                    next_state &lt;= S0;      -- 输入0，进入S0（010起始）
+                else
+                    next_state &lt;= S1;      -- 输入1，进入S1（111起始）
+                end if;
+
+            when S0 =&gt;    -- 已检测到第一个0
+                if din = '0' then
+                    next_state &lt;= S0;      -- 连续0，保持S0
+                else
+                    next_state &lt;= S01;     -- 输入1，进入01状态
+                end if;
+
+            when S01 =&gt;   -- 已检测到01
+                if din = '0' then
+                    next_state &lt;= S010;    -- 输入0，检测到010！
+                else
+                    next_state &lt;= S1;      -- 输入1，跳转到1起始
+                end if;
+
+            when S1 =&gt;    -- 已检测到第一个1
+                if din = '1' then
+                    next_state &lt;= S11;     -- 输入1，进入11状态
+                else
+                    next_state &lt;= S0;      -- 输入0，跳转到0起始
+                end if;
+
+            when S11 =&gt;   -- 已检测到11
+                if din = '1' then
+                    next_state &lt;= S111;    -- 输入1，检测到111！
+                else
+                    next_state &lt;= S0;      -- 输入0，跳转到0起始
+                end if;
+
+            when S010 =&gt;  -- 检测到010，立即判断下一个输入
+                if din = '0' then
+                    next_state &lt;= S0;
+                else
+                    next_state &lt;= S1;
+                end if;
+
+            when S111 =&gt;  -- 检测到111，立即判断下一个输入
+                if din = '0' then
+                    next_state &lt;= S0;
+                else
+                    next_state &lt;= S111;
+                end if;
+
+            when others =&gt;
+                next_state &lt;= IDLE;
+        end case;
+    end process;
+
+    -- 第三段：组合逻辑，输出逻辑（Moore型，只和当前状态相关）
+    process(current_state)
+    begin
+        -- 默认输出低电平
+        short_push &lt;= '0';
+        long_push  &lt;= '0';
+        
+        case current_state is
+            when S010 =&gt;
+                short_push &lt;= '1';   -- 检测到010，输出有效
+            when S111 =&gt;
+                long_push  &lt;= '1';   -- 检测到111，输出有效
+            when others =&gt;
+                short_push &lt;= '0';
+                long_push  &lt;= '0';
+        end case;
+    end process;
+
+end Behavioral;</vhdl>
+</project>

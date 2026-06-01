@@ -1,0 +1,1063 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project source="3.8.0" version="1.0">
+  This file is intended to be loaded by Logisim-evolution v3.8.0(https://github.com/logisim-evolution/).
+
+  <lib desc="#Wiring" name="0">
+    <tool name="Pin">
+      <a name="appearance" val="classic"/>
+    </tool>
+  </lib>
+  <lib desc="#Gates" name="1"/>
+  <lib desc="#Plexers" name="2"/>
+  <lib desc="#Arithmetic" name="3"/>
+  <lib desc="#Memory" name="4"/>
+  <lib desc="#I/O" name="5"/>
+  <lib desc="#TTL" name="6"/>
+  <lib desc="#TCL" name="7"/>
+  <lib desc="#Base" name="8"/>
+  <lib desc="#BFH-Praktika" name="9"/>
+  <lib desc="#Input/Output-Extra" name="10"/>
+  <lib desc="#Soc" name="11"/>
+  <main name="adder4bit_testbench"/>
+  <options>
+    <a name="gateUndefined" val="ignore"/>
+    <a name="simlimit" val="1000"/>
+    <a name="simrand" val="0"/>
+  </options>
+  <mappings>
+    <tool lib="8" map="Button2" name="Poke Tool"/>
+    <tool lib="8" map="Button3" name="Menu Tool"/>
+    <tool lib="8" map="Ctrl Button1" name="Menu Tool"/>
+  </mappings>
+  <toolbar>
+    <tool lib="8" name="Poke Tool"/>
+    <tool lib="8" name="Edit Tool"/>
+    <tool lib="8" name="Wiring Tool"/>
+    <tool lib="8" name="Text Tool"/>
+    <sep/>
+    <tool lib="0" name="Pin"/>
+    <tool lib="0" name="Pin">
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+    </tool>
+    <sep/>
+    <tool lib="1" name="NOT Gate"/>
+    <tool lib="1" name="AND Gate"/>
+    <tool lib="1" name="OR Gate"/>
+    <tool lib="1" name="XOR Gate"/>
+    <tool lib="1" name="NAND Gate"/>
+    <tool lib="1" name="NOR Gate"/>
+    <sep/>
+    <tool lib="4" name="D Flip-Flop"/>
+    <tool lib="4" name="Register"/>
+  </toolbar>
+  <circuit name="main">
+    <a name="appearance" val="logisim_evolution"/>
+    <a name="circuit" val="main"/>
+    <a name="circuitnamedboxfixedsize" val="true"/>
+    <a name="simulationFrequency" val="4.0"/>
+    <comp lib="0" loc="(120,110)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="width" val="4"/>
+    </comp>
+    <comp lib="0" loc="(120,130)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="width" val="4"/>
+    </comp>
+    <comp lib="0" loc="(450,130)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+      <a name="width" val="4"/>
+    </comp>
+    <comp lib="0" loc="(450,220)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+    </comp>
+    <comp lib="0" loc="(450,240)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+      <a name="width" val="4"/>
+    </comp>
+    <comp lib="0" loc="(610,110)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+    </comp>
+    <comp lib="0" loc="(740,330)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+    </comp>
+    <comp lib="5" loc="(720,310)" name="LED">
+      <a name="facing" val="south"/>
+    </comp>
+    <comp loc="(430,110)" name="adder4bit">
+      <a name="appearance" val="logisim_evolution"/>
+      <a name="labelvisible" val="true"/>
+    </comp>
+    <comp loc="(430,220)" name="adder4bit">
+      <a name="appearance" val="logisim_evolution"/>
+    </comp>
+    <comp loc="(710,330)" name="helloworld">
+      <a name="appearance" val="logisim_evolution"/>
+    </comp>
+    <wire from="(120,110)" to="(160,110)"/>
+    <wire from="(120,130)" to="(140,130)"/>
+    <wire from="(140,130)" to="(140,240)"/>
+    <wire from="(140,130)" to="(210,130)"/>
+    <wire from="(140,240)" to="(210,240)"/>
+    <wire from="(160,110)" to="(160,220)"/>
+    <wire from="(160,110)" to="(210,110)"/>
+    <wire from="(160,220)" to="(210,220)"/>
+    <wire from="(430,110)" to="(570,110)"/>
+    <wire from="(430,130)" to="(450,130)"/>
+    <wire from="(430,220)" to="(450,220)"/>
+    <wire from="(430,240)" to="(450,240)"/>
+    <wire from="(460,290)" to="(460,330)"/>
+    <wire from="(460,290)" to="(570,290)"/>
+    <wire from="(460,330)" to="(490,330)"/>
+    <wire from="(570,110)" to="(570,290)"/>
+    <wire from="(570,110)" to="(610,110)"/>
+    <wire from="(710,330)" to="(720,330)"/>
+    <wire from="(720,310)" to="(720,330)"/>
+    <wire from="(720,330)" to="(740,330)"/>
+  </circuit>
+  <circuit name="adder4bit_testbench">
+    <a name="appearance" val="logisim_evolution"/>
+    <a name="circuit" val="adder4bit_testbench"/>
+    <a name="circuitnamedboxfixedsize" val="true"/>
+    <a name="simulationFrequency" val="4.0"/>
+    <comp lib="0" loc="(290,300)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="width" val="4"/>
+    </comp>
+    <comp lib="0" loc="(290,320)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="width" val="4"/>
+    </comp>
+    <comp lib="0" loc="(690,300)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+    </comp>
+    <comp lib="0" loc="(690,320)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+      <a name="width" val="4"/>
+    </comp>
+    <comp loc="(590,300)" name="adder4bit">
+      <a name="appearance" val="logisim_evolution"/>
+    </comp>
+    <wire from="(290,300)" to="(370,300)"/>
+    <wire from="(290,320)" to="(370,320)"/>
+    <wire from="(590,300)" to="(690,300)"/>
+    <wire from="(590,320)" to="(690,320)"/>
+  </circuit>
+  <circuit name="helloworld_testbench">
+    <a name="appearance" val="logisim_evolution"/>
+    <a name="circuit" val="helloworld_testbench"/>
+    <a name="circuitnamedboxfixedsize" val="true"/>
+    <a name="simulationFrequency" val="4.0"/>
+    <comp lib="0" loc="(240,270)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="5" loc="(560,270)" name="LED"/>
+    <comp loc="(500,270)" name="helloworld">
+      <a name="appearance" val="logisim_evolution"/>
+    </comp>
+    <wire from="(240,270)" to="(280,270)"/>
+    <wire from="(500,270)" to="(560,270)"/>
+  </circuit>
+  <circuit name="you_xian_ji_testbench">
+    <a name="appearance" val="logisim_evolution"/>
+    <a name="circuit" val="you_xian_ji_testbench"/>
+    <a name="circuitnamedboxfixedsize" val="true"/>
+    <a name="simulationFrequency" val="4.0"/>
+    <comp lib="0" loc="(160,220)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(160,240)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(160,260)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(480,220)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+    </comp>
+    <comp loc="(430,220)" name="you_xian_ji">
+      <a name="appearance" val="logisim_evolution"/>
+    </comp>
+    <wire from="(160,220)" to="(210,220)"/>
+    <wire from="(160,240)" to="(210,240)"/>
+    <wire from="(160,260)" to="(210,260)"/>
+    <wire from="(430,220)" to="(480,220)"/>
+  </circuit>
+  <circuit name="quan_jia_qi_testbench">
+    <a name="appearance" val="logisim_evolution"/>
+    <a name="circuit" val="quan_jia_qi_testbench"/>
+    <a name="circuitnamedboxfixedsize" val="true"/>
+    <a name="simulationFrequency" val="4.0"/>
+    <comp lib="0" loc="(130,210)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(130,230)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(130,250)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(450,210)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+    </comp>
+    <comp lib="0" loc="(450,230)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+    </comp>
+    <comp loc="(420,210)" name="quan_jia_qi">
+      <a name="appearance" val="logisim_evolution"/>
+    </comp>
+    <wire from="(130,210)" to="(200,210)"/>
+    <wire from="(130,230)" to="(200,230)"/>
+    <wire from="(130,250)" to="(200,250)"/>
+    <wire from="(420,210)" to="(450,210)"/>
+    <wire from="(420,230)" to="(450,230)"/>
+  </circuit>
+  <circuit name="quan_jia_qi_2_testbench">
+    <a name="appearance" val="logisim_evolution"/>
+    <a name="circuit" val="quan_jia_qi_2_testbench"/>
+    <a name="circuitnamedboxfixedsize" val="true"/>
+    <a name="simulationFrequency" val="4.0"/>
+    <comp lib="0" loc="(120,160)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(120,180)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(120,200)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(390,160)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+    </comp>
+    <comp lib="0" loc="(390,180)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+    </comp>
+    <comp loc="(360,160)" name="quan_jia_qi_2">
+      <a name="appearance" val="logisim_evolution"/>
+    </comp>
+    <wire from="(120,160)" to="(140,160)"/>
+    <wire from="(120,180)" to="(140,180)"/>
+    <wire from="(120,200)" to="(140,200)"/>
+    <wire from="(360,160)" to="(390,160)"/>
+    <wire from="(360,180)" to="(390,180)"/>
+  </circuit>
+  <circuit name="adder4bit_jiegou_testbench">
+    <a name="appearance" val="logisim_evolution"/>
+    <a name="circuit" val="adder4bit_jiegou_testbench"/>
+    <a name="circuitnamedboxfixedsize" val="true"/>
+    <a name="simulationFrequency" val="4.0"/>
+    <comp lib="0" loc="(150,250)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="width" val="4"/>
+    </comp>
+    <comp lib="0" loc="(150,270)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="width" val="4"/>
+    </comp>
+    <comp lib="0" loc="(450,250)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+    </comp>
+    <comp lib="0" loc="(450,270)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+      <a name="width" val="4"/>
+    </comp>
+    <comp loc="(410,250)" name="adder4bit_jiegou">
+      <a name="appearance" val="logisim_evolution"/>
+    </comp>
+    <wire from="(150,250)" to="(190,250)"/>
+    <wire from="(150,270)" to="(190,270)"/>
+    <wire from="(410,250)" to="(450,250)"/>
+    <wire from="(410,270)" to="(450,270)"/>
+  </circuit>
+  <circuit name="qi_duan_shu_ma_guan_testbench">
+    <a name="appearance" val="logisim_evolution"/>
+    <a name="circuit" val="qi_duan_shu_ma_guan_testbench"/>
+    <a name="circuitnamedboxfixedsize" val="true"/>
+    <a name="simulationFrequency" val="4.0"/>
+    <comp lib="0" loc="(140,120)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="width" val="4"/>
+    </comp>
+    <comp lib="5" loc="(530,150)" name="7-Segment Display"/>
+    <comp loc="(410,120)" name="qi_duan_shu_ma_guan">
+      <a name="appearance" val="logisim_evolution"/>
+    </comp>
+    <wire from="(140,120)" to="(190,120)"/>
+    <wire from="(410,120)" to="(550,120)"/>
+    <wire from="(410,140)" to="(560,140)"/>
+    <wire from="(410,160)" to="(510,160)"/>
+    <wire from="(410,180)" to="(500,180)"/>
+    <wire from="(410,200)" to="(490,200)"/>
+    <wire from="(410,220)" to="(480,220)"/>
+    <wire from="(410,240)" to="(470,240)"/>
+    <wire from="(470,90)" to="(470,240)"/>
+    <wire from="(470,90)" to="(530,90)"/>
+    <wire from="(480,100)" to="(480,220)"/>
+    <wire from="(480,100)" to="(540,100)"/>
+    <wire from="(490,200)" to="(490,250)"/>
+    <wire from="(490,250)" to="(530,250)"/>
+    <wire from="(500,180)" to="(500,240)"/>
+    <wire from="(500,240)" to="(540,240)"/>
+    <wire from="(510,160)" to="(510,230)"/>
+    <wire from="(510,230)" to="(550,230)"/>
+    <wire from="(530,210)" to="(530,250)"/>
+    <wire from="(530,90)" to="(530,150)"/>
+    <wire from="(540,100)" to="(540,150)"/>
+    <wire from="(540,210)" to="(540,240)"/>
+    <wire from="(550,120)" to="(550,150)"/>
+    <wire from="(550,210)" to="(550,230)"/>
+    <wire from="(560,140)" to="(560,150)"/>
+  </circuit>
+  <circuit name="ji_cun_qi_testbench">
+    <a name="appearance" val="logisim_evolution"/>
+    <a name="circuit" val="ji_cun_qi_testbench"/>
+    <a name="circuitnamedboxfixedsize" val="true"/>
+    <a name="simulationFrequency" val="4.0"/>
+    <comp lib="0" loc="(110,180)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="width" val="4"/>
+    </comp>
+    <comp lib="0" loc="(140,160)" name="Clock"/>
+    <comp lib="0" loc="(440,160)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+      <a name="width" val="4"/>
+    </comp>
+    <comp loc="(380,160)" name="ji_cun_qi">
+      <a name="appearance" val="logisim_evolution"/>
+    </comp>
+    <wire from="(110,180)" to="(160,180)"/>
+    <wire from="(140,160)" to="(160,160)"/>
+    <wire from="(380,160)" to="(440,160)"/>
+  </circuit>
+  <circuit name="ji_shu_qi_testbench">
+    <a name="appearance" val="logisim_evolution"/>
+    <a name="circuit" val="ji_shu_qi_testbench"/>
+    <a name="circuitnamedboxfixedsize" val="true"/>
+    <a name="simulationFrequency" val="4.0"/>
+    <comp lib="0" loc="(100,200)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(150,180)" name="Clock"/>
+    <comp lib="0" loc="(470,180)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+      <a name="width" val="4"/>
+    </comp>
+    <comp lib="5" loc="(460,150)" name="Hex Digit Display"/>
+    <comp loc="(420,180)" name="ji_shu_qi">
+      <a name="appearance" val="logisim_evolution"/>
+    </comp>
+    <wire from="(100,200)" to="(200,200)"/>
+    <wire from="(150,180)" to="(200,180)"/>
+    <wire from="(420,180)" to="(460,180)"/>
+    <wire from="(460,150)" to="(460,180)"/>
+    <wire from="(460,180)" to="(470,180)"/>
+  </circuit>
+  <circuit name="you_xian_zhuang_tai_ji_testbench">
+    <a name="appearance" val="logisim_evolution"/>
+    <a name="circuit" val="you_xian_zhuang_tai_ji_testbench"/>
+    <a name="circuitnamedboxfixedsize" val="true"/>
+    <a name="simulationFrequency" val="4.0"/>
+    <comp lib="0" loc="(120,180)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(120,200)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(140,160)" name="Clock"/>
+    <comp lib="0" loc="(460,160)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+    </comp>
+    <comp loc="(420,160)" name="you_xian_zhuang_tai_ji">
+      <a name="appearance" val="logisim_evolution"/>
+    </comp>
+    <wire from="(120,180)" to="(200,180)"/>
+    <wire from="(120,200)" to="(200,200)"/>
+    <wire from="(140,160)" to="(200,160)"/>
+    <wire from="(420,160)" to="(460,160)"/>
+  </circuit>
+  <vhdl name="adder4bit">--------------------------------------------------------------------------------&#13;
+-- Project :&#13;
+-- File    :&#13;
+-- Autor   :&#13;
+-- Date    :&#13;
+--&#13;
+--------------------------------------------------------------------------------&#13;
+-- Description :&#13;
+--&#13; 利用std_logic_vector实现4位加法器
+--------------------------------------------------------------------------------&#13;
+&#13;
+LIBRARY ieee;&#13;
+USE ieee.std_logic_1164.all;&#13;
+
+use ieee.numeric_std_unsigned.all;  -- 提供+运算符并按无符号处理
+
+ENTITY adder4bit IS&#13;
+  PORT (&#13;
+  ------------------------------------------------------------------------------&#13;
+  --Insert input ports below&#13;
+	A	     : IN  std_logic_vector(3 DOWNTO 0); 
+	B		: IN  std_logic_vector(3 DOWNTO 0); 
+  ------------------------------------------------------------------------------&#13;
+  --Insert output ports below&#13;
+	carry	: OUT std_logic;                    
+	sum		: OUT std_logic_vector(3 DOWNTO 0)
+    );&#13;
+END adder4bit;&#13;
+&#13;
+--------------------------------------------------------------------------------&#13;
+--Complete your VHDL description below&#13;
+--------------------------------------------------------------------------------&#13;
+&#13;
+ARCHITECTURE behv OF adder4bit IS&#13;
+&#13;
+-- define a temparary signal to store the result
+signal result: std_logic_vector(4 downto 0);
+
+BEGIN&#13;
+&#13;
+    -- the highest bit should be carry
+    result &lt;= ('0' &amp; A)+('0' &amp; B);
+    sum &lt;= result(3 downto 0);
+    carry &lt;= result(4);
+&#13;
+END behv;&#13;
+</vhdl>
+  <vhdl name="helloworld">--------------------------------------------------------------------------------&#13;
+-- Project :&#13;
+-- File    :&#13;
+-- Autor   :&#13;
+-- Date    :&#13;
+--&#13;
+--------------------------------------------------------------------------------&#13;
+-- Description :&#13;
+--&#13; Logisim默认生成的VHDL代码模板稍作修改
+--------------------------------------------------------------------------------&#13;
+&#13;
+LIBRARY ieee;&#13;
+USE ieee.std_logic_1164.all;&#13;
+&#13;
+ENTITY helloworld IS&#13;
+  PORT (&#13;
+  ------------------------------------------------------------------------------&#13;
+  --Insert input ports below&#13;
+    clock      : IN  std_logic;                    -- input bit example&#13;
+    val        : IN  std_logic_vector(3 DOWNTO 0); -- input vector example&#13;
+  ------------------------------------------------------------------------------&#13;
+  --Insert output ports below&#13;
+    max        : OUT std_logic;                    -- output bit example&#13;
+    cpt        : OUT std_logic_vector(3 DOWNTO 0)  -- output vector example&#13;
+    );&#13;
+END helloworld;&#13;
+&#13;
+--------------------------------------------------------------------------------&#13;
+--Complete your VHDL description below&#13;
+--------------------------------------------------------------------------------&#13;
+&#13;
+ARCHITECTURE TypeArchitecture OF helloworld IS&#13;
+&#13;
+BEGIN&#13;
+&#13;  max &lt;= not clock;
+&#13;
+END TypeArchitecture;&#13;
+</vhdl>
+  <vhdl name="you_xian_ji">--------------------------------------------------------------------------------&#13;
+-- Project :&#13;
+-- File    :&#13;
+-- Autor   :&#13;
+-- Date    :&#13;
+--&#13;
+--------------------------------------------------------------------------------&#13;
+-- Description :&#13;
+--&#13; 运算符优先级示例
+--------------------------------------------------------------------------------&#13;
+&#13;
+LIBRARY ieee;&#13;
+USE ieee.std_logic_1164.all;&#13;
+&#13;
+ENTITY you_xian_ji IS&#13;
+  PORT (&#13;
+  ------------------------------------------------------------------------------&#13;
+  --Insert input ports below&#13;
+    a      : IN  std_logic;                    -- input bit example&#13;
+    b      : IN  std_logic;                    -- input bit example
+    c      : IN  std_logic;                    -- input bit example
+  ------------------------------------------------------------------------------&#13;
+  --Insert output ports below&#13;
+    y        : OUT std_logic                    -- output bit example&#13;
+    );&#13;
+END you_xian_ji;&#13;
+&#13;
+--------------------------------------------------------------------------------&#13;
+--Complete your VHDL description below&#13;
+--------------------------------------------------------------------------------&#13;
+&#13;
+ARCHITECTURE TypeArchitecture OF you_xian_ji IS&#13;
+&#13;
+BEGIN&#13;
+&#13;   y &lt;= a or (b and c);
+&#13;
+END TypeArchitecture;&#13;
+</vhdl>
+  <vhdl name="quan_jia_qi">--------------------------------------------------------------------------------&#13;
+-- Project :&#13;
+-- File    :&#13;
+-- Autor   :&#13;
+-- Date    :&#13;
+--&#13;
+--------------------------------------------------------------------------------&#13;
+-- Description :&#13;
+--&#13; 利用逻辑运算构建的全加器
+--------------------------------------------------------------------------------&#13;
+&#13;
+LIBRARY ieee;&#13;
+USE ieee.std_logic_1164.all;&#13;
+&#13;
+ENTITY quan_jia_qi IS&#13;
+  PORT (&#13;
+  ------------------------------------------------------------------------------&#13;
+  --Insert input ports below&#13;
+    a     : IN  std_logic;                  -- input bit example&#13;
+    b     : IN  std_logic;                  -- input bit example
+    cin   : IN  std_logic;                  -- input bit example
+  ------------------------------------------------------------------------------&#13;
+  --Insert output ports below&#13;
+    sum   : OUT std_logic;                  -- output bit example&#13;
+    cout  : OUT std_logic                   -- output bit example
+    );&#13;
+END quan_jia_qi;&#13;
+&#13;
+--------------------------------------------------------------------------------&#13;
+--Complete your VHDL description below&#13;
+--------------------------------------------------------------------------------&#13;
+&#13;
+ARCHITECTURE TypeArchitecture OF quan_jia_qi IS&#13;
+&#13;
+BEGIN&#13;
+&#13;    
+    sum  &lt;= a xor b xor cin;
+    cout &lt;= (a and b) or (a and cin) or (b and cin);    
+    
+END TypeArchitecture;&#13;
+</vhdl>
+  <vhdl name="quan_jia_qi_2">--------------------------------------------------------------------------------&#13;
+-- Project :&#13;
+-- File    :&#13;
+-- Autor   :&#13;
+-- Date    :&#13;
+--&#13;
+--------------------------------------------------------------------------------&#13;
+-- Description :&#13;
+--&#13; 利用算术运算符构建的全加器
+--------------------------------------------------------------------------------&#13;
+
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+
+use ieee.numeric_std_unsigned.all;  -- 提供+运算符并按无符号处理
+
+ENTITY quan_jia_qi_2 IS
+  PORT (
+  ------------------------------------------------------------------------------
+  --Insert input ports below
+    a     : IN  std_logic;                    -- input bit example
+    b     : IN  std_logic;                    -- input bit example
+    cin     : IN  std_logic;                    -- input bit example
+  ------------------------------------------------------------------------------
+  --Insert output ports below
+    sum        : OUT std_logic;                    -- output bit example
+    cout        : OUT std_logic                    -- output bit example
+    );
+END quan_jia_qi_2;
+
+--------------------------------------------------------------------------------
+--Complete your VHDL description below
+--------------------------------------------------------------------------------
+
+ARCHITECTURE TypeArchitecture OF quan_jia_qi_2 IS
+
+    -- define a temparary signal to store the result
+    signal result: std_logic_vector(1 downto 0);
+
+BEGIN
+
+    result &lt;= ("0" &amp; a) + ("0" &amp; b) + ("0" &amp; cin); -- + 是算术运算，&amp;用于补齐位宽
+    sum &lt;= result(0);  -- result的低位是sum
+    cout &lt;= result(1); -- result的高位是cout
+
+END TypeArchitecture;
+
+</vhdl>
+  <vhdl name="adder4bit_jiegou">--------------------------------------------------------------------------------&#13;
+-- Project :&#13;
+-- File    :&#13;
+-- Autor   :&#13;
+-- Date    :&#13;
+--&#13;
+--------------------------------------------------------------------------------&#13;
+-- Description :&#13;
+--&#13; 4比特加法器的结构建模示例
+--------------------------------------------------------------------------------&#13;
+&#13;
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+
+ENTITY adder4bit_jiegou IS
+  PORT (
+  ------------------------------------------------------------------------------
+  --Insert input ports below
+	A	     : IN  std_logic_vector(3 DOWNTO 0); 
+	B		: IN  std_logic_vector(3 DOWNTO 0); 
+  ------------------------------------------------------------------------------
+  --Insert output ports below
+	carry	: OUT std_logic;                    
+	sum		: OUT std_logic_vector(3 DOWNTO 0)
+    );
+END adder4bit_jiegou;
+
+--------------------------------------------------------------------------------
+--Complete your VHDL description below
+--------------------------------------------------------------------------------
+
+ARCHITECTURE behv OF adder4bit_jiegou IS
+
+COMPONENT quan_jia_qi
+  PORT (
+  ------------------------------------------------------------------------------
+  --Insert input ports below
+    a     : IN  std_logic;                   
+    b     : IN  std_logic;                    
+    cin   : IN  std_logic;                    
+  ------------------------------------------------------------------------------
+  --Insert output ports below
+    sum        : OUT std_logic;                    
+    cout       : OUT std_logic                    
+    );
+END COMPONENT quan_jia_qi;
+
+-- define a temparary signal to store the result
+signal result: std_logic_vector(4 downto 0);
+signal n0, n1, n2: std_logic;
+
+BEGIN
+ 
+    adder0: quan_jia_qi port map(A(0), B(0), '0', result(0), n0);
+    adder1: quan_jia_qi port map(A(1), B(1),  n0, result(1), n1);
+    adder2: quan_jia_qi port map(A(2), B(2),  n1, result(2), n2);
+    adder3: quan_jia_qi port map(A(3), B(3),  n2, result(3), result(4));
+    
+    -- the highest bit should be carry
+    sum   &lt;= result(3 downto 0);
+    carry &lt;= result(4);
+
+END behv;
+</vhdl>
+  <vhdl name="qi_duan_shu_ma_guan">--------------------------------------------------------------------------------&#13;
+-- Project :&#13;
+-- File    :&#13;
+-- Autor   :&#13;
+-- Date    :&#13;
+--&#13;
+--------------------------------------------------------------------------------&#13;
+-- Description :&#13;
+--&#13;
+--------------------------------------------------------------------------------&#13;
+&#13;
+LIBRARY ieee;&#13;
+USE ieee.std_logic_1164.all;&#13;
+&#13;
+ENTITY qi_duan_shu_ma_guan IS&#13;
+  PORT (&#13;
+    i_Binary_Num : in  std_logic_vector(3 downto 0);
+    o_Segment_A  : out std_logic;
+    o_Segment_B  : out std_logic;
+    o_Segment_C  : out std_logic;
+    o_Segment_D  : out std_logic;
+    o_Segment_E  : out std_logic;
+    o_Segment_F  : out std_logic;
+    o_Segment_G  : out std_logic
+    );&#13;
+END qi_duan_shu_ma_guan;&#13;
+&#13;
+--------------------------------------------------------------------------------&#13;
+--Complete your VHDL description below&#13;
+--------------------------------------------------------------------------------&#13;
+&#13;
+ARCHITECTURE TypeArchitecture OF qi_duan_shu_ma_guan IS&#13;
+
+    signal LED_out : std_logic_vector(6 downto 0) := (others =&gt; '0');
+&#13;
+BEGIN&#13;
+&#13;
+process(i_Binary_Num)						--decoder bcd-7segment
+  begin
+    case i_Binary_Num is -- from a to g
+      when "0000" =&gt; LED_out &lt;= "1111110"; -- 0     
+      when "0001" =&gt; LED_out &lt;= "0110000"; -- 1 
+      when "0010" =&gt; LED_out &lt;= "1101101"; -- 2 
+      when "0011" =&gt; LED_out &lt;= "1111001"; -- 3 
+      when "0100" =&gt; LED_out &lt;= "0110011"; -- 4 
+      when "0101" =&gt; LED_out &lt;= "1011011"; -- 5 
+      when "0110" =&gt; LED_out &lt;= "1011111"; -- 6 
+      when "0111" =&gt; LED_out &lt;= "1110000"; -- 7 
+      when "1000" =&gt; LED_out &lt;= "1111111"; -- 8     
+      when "1001" =&gt; LED_out &lt;= "1110011"; -- 9
+      when others =&gt; LED_out &lt;= "0000000"; -- A~F
+    end case;
+end process;
+
+  o_Segment_A &lt;= LED_out(6);
+  o_Segment_B &lt;= LED_out(5);
+  o_Segment_C &lt;= LED_out(4);
+  o_Segment_D &lt;= LED_out(3);
+  o_Segment_E &lt;= LED_out(2);
+  o_Segment_F &lt;= LED_out(1);
+  o_Segment_G &lt;= LED_out(0);
+&#13;
+END TypeArchitecture;&#13;
+</vhdl>
+  <vhdl name="ji_cun_qi">--------------------------------------------------------------------------------&#13;
+-- Project :&#13;
+-- File    :&#13;
+-- Autor   :&#13;
+-- Date    :&#13;
+--&#13;
+--------------------------------------------------------------------------------&#13;
+-- Description :&#13;
+--&#13; 寄存器
+--------------------------------------------------------------------------------&#13;
+&#13;
+LIBRARY ieee;&#13;
+USE ieee.std_logic_1164.all;&#13;
+&#13;
+ENTITY ji_cun_qi IS&#13;
+  PORT (&#13;
+  ------------------------------------------------------------------------------&#13;
+  --Insert input ports below&#13;
+    clock      : IN  std_logic;                    -- input bit example&#13;
+    d          : IN  std_logic_vector(3 DOWNTO 0); -- input vector example&#13;
+  ------------------------------------------------------------------------------&#13;
+  --Insert output ports below&#13;
+    q          : OUT std_logic_vector(3 DOWNTO 0)  -- output vector example&#13;
+    );&#13;
+END ji_cun_qi;&#13;
+&#13;
+--------------------------------------------------------------------------------&#13;
+--Complete your VHDL description below&#13;
+--------------------------------------------------------------------------------&#13;
+&#13;
+ARCHITECTURE TypeArchitecture OF ji_cun_qi IS&#13;
+&#13;
+BEGIN&#13;
+&#13;  
+  process(clock) begin
+    if rising_edge(clock) then --rising_edge()用于获取clock的上升沿
+      q &lt;= d;
+    end if;
+  end process;
+&#13;
+END TypeArchitecture;&#13;
+</vhdl>
+  <vhdl name="ji_shu_qi">--------------------------------------------------------------------------------&#13;
+-- Project :&#13;
+-- File    :&#13;
+-- Autor   :&#13;
+-- Date    :&#13;
+--&#13;
+--------------------------------------------------------------------------------&#13;
+-- Description :&#13;
+--&#13; 同步复位计数器
+--------------------------------------------------------------------------------&#13;
+&#13;
+LIBRARY ieee;&#13;
+USE ieee.std_logic_1164.all;&#13;
+
+USE ieee.numeric_std_unsigned.all;  -- 提供+运算符并按无符号处理
+&#13;
+ENTITY ji_shu_qi IS&#13;
+  PORT (&#13;
+  ------------------------------------------------------------------------------&#13;
+  --Insert input ports below&#13;
+    clk, reset      : IN  std_logic;                    -- input bit example&#13;
+  ------------------------------------------------------------------------------&#13;
+  --Insert output ports below&#13;
+    q               : OUT std_logic_vector(3 DOWNTO 0)  -- output vector example&#13;
+    );&#13;
+END ji_shu_qi;&#13;
+&#13;
+--------------------------------------------------------------------------------&#13;
+--Complete your VHDL description below&#13;
+--------------------------------------------------------------------------------&#13;
+&#13;
+ARCHITECTURE TypeArchitecture OF ji_shu_qi IS&#13;
+
+&#13;  signal counter              : std_logic_vector(3 DOWNTO 0);
+
+BEGIN&#13;
+&#13;
+  process(clk) begin
+    if reset = '1' then
+      counter &lt;= (OTHERS =&gt; '0');
+    elsif rising_edge(clk) then
+      counter &lt;= counter +'1';
+    end if;
+  end process;
+&#13;
+  q &lt;= counter;
+
+END TypeArchitecture;&#13;
+</vhdl>
+  <vhdl name="you_xian_zhuang_tai_ji">--------------------------------------------------------------------------------&#13;
+-- Project :&#13;
+-- File    :&#13;
+-- Autor   :&#13;
+-- Date    :&#13;
+--&#13;
+--------------------------------------------------------------------------------&#13;
+-- Description :&#13;
+--&#13; 一个简单的有限状态机的示例 (异步复位)
+--------------------------------------------------------------------------------&#13;
+&#13;
+LIBRARY ieee;&#13;
+USE ieee.std_logic_1164.all;&#13;
+&#13;
+ENTITY you_xian_zhuang_tai_ji IS&#13;
+  PORT (&#13;
+  ------------------------------------------------------------------------------&#13;
+  --Insert input ports below&#13;
+    clk, reset      : IN  std_logic;                    
+    in0             : IN  std_logic; 
+  ------------------------------------------------------------------------------&#13;
+  --Insert output ports below&#13;
+    y        : OUT std_logic                    -- output bit example&#13;
+    );&#13;
+END you_xian_zhuang_tai_ji;&#13;
+&#13;
+--------------------------------------------------------------------------------&#13;
+--Complete your VHDL description below&#13;
+--------------------------------------------------------------------------------&#13;
+&#13;
+ARCHITECTURE TypeArchitecture OF you_xian_zhuang_tai_ji IS&#13;
+
+  type statetype is (IDLE, S0, S1);
+  signal state, nextstate: statetype;
+&#13;
+BEGIN&#13;
+
+  -- 状态寄存器的更新
+  process(clk, reset) begin
+    if reset = '1' then
+      state &lt;= IDLE;
+    elsif rising_edge(clk) then
+      state &lt;= nextstate;
+    end if;
+  end process;
+&#13;
+  -- 组合逻辑：计算下一个状态
+  process(state) begin
+    case state is
+      when IDLE =&gt;
+        if in0 = '0' then 	nextstate &lt;= IDLE;
+        else			     nextstate &lt;= S0;
+        end if;
+      when S0 =&gt;
+        if in0 = '0' then 	nextstate &lt;= IDLE;
+        else				nextstate &lt;= S1;
+        end if;
+      when S1 =&gt;
+        if in0 = '0' then 	nextstate &lt;= IDLE;
+        else				nextstate &lt;= S1;
+        end if;
+      when others =&gt;		nextstate &lt;= IDLE;  
+    end case;  
+  end process;
+
+  -- 组合逻辑：计算输出
+  y &lt;= '1' when state = S1 else '0';
+&#13;
+END TypeArchitecture;&#13;
+</vhdl>
+  <vhdl name="vhdl_testbench_example">--------------------------------------------------------------------------------&#13;
+-- Project :&#13;
+-- File    :&#13;
+-- Autor   :&#13;
+-- Date    :&#13;
+--&#13;
+--------------------------------------------------------------------------------&#13;
+-- Description :&#13;
+--&#13; 使用代码编写测试程序
+--------------------------------------------------------------------------------&#13;
+&#13;
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity vhdl_testbench_example is				-- entity declaration
+end vhdl_testbench_example;
+
+architecture TB of vhdl_testbench_example is
+
+  component adder4bit
+    PORT (
+    ------------------------------------------------------------------------------
+    --Insert input ports below
+     	A	     : IN  std_logic_vector(3 DOWNTO 0); 
+	     B		: IN  std_logic_vector(3 DOWNTO 0); 
+    ------------------------------------------------------------------------------
+    --Insert output ports below
+	     carry	: OUT std_logic;                    
+	     sum		: OUT std_logic_vector(3 DOWNTO 0)
+        );
+  END component adder4bit;
+
+    signal A, B:	std_logic_vector(3 downto 0);
+    signal carry:	std_logic;
+    signal sum:	std_logic_vector(3 downto 0);
+
+begin
+
+    dut: adder4bit port map (A, B, carry, sum);
+
+    process			
+	
+	  variable err_cnt: integer :=0;
+    
+    begin												  
+		
+	  -- case 1
+	  A &lt;= "0000";							
+	  B &lt;= "0000";
+	  wait for 10 ns;
+	  assert (sum="0000") report "Sum Error!" severity error;
+	  assert (carry='0') report "Carry Error!" severity error;
+	  if (sum/="0000" or carry/='0') then
+	    err_cnt:=err_cnt+1;
+	  end if;
+	  	
+ 	  -- case 2 		
+	  A &lt;= "0011";
+	  B &lt;= "0011";
+	  wait for 10 ns;												  
+	  assert (sum="0110") report "Sum Error!" severity error;	 
+	  assert (carry='0') report "Carry Error!" severity error;
+	  if (sum/="0110" or carry/='0') then
+	    err_cnt:=err_cnt+1;
+	  end if;
+		
+	  -- case 3
+	  A &lt;= "0001";
+	  B &lt;= "0010";
+	  wait for 10 ns;												  
+	  assert (sum="0011") report "Sum Error!" severity error;	 
+	  assert (carry='0') report "Carry Error!" severity error;
+	  if (sum/="0011" or carry/='0') then
+	    err_cnt:=err_cnt+1;
+	  end if;
+		
+	  -- case 4
+	  A &lt;= "0010";
+	  B &lt;= "0001";
+	  wait for 10 ns;												  
+	  assert (sum="0011") report "Sum Error!" severity error;	 
+	  assert (carry='0') report "Carry Error!" severity error;
+	  if (sum/="0011" or carry/='0') then
+	    err_cnt:=err_cnt+1;
+	  end if;
+		
+	  -- case 5
+	  A &lt;= "0001";
+	  B &lt;= "0001";
+	  wait for 10 ns;
+	  assert (sum="0010") report "Sum Error!" severity error;
+	  assert (carry='0') report "Carry Error!" severity error;
+	  if (sum/="0010" or carry/='0') then
+	    err_cnt:=err_cnt+1;
+	  end if;
+		
+	  -- summary of testbench
+	  if (err_cnt=0) then
+	    assert false
+	    report "Testbench of Adder completed successfully!"
+	    severity note;
+	  else
+	    assert true
+	    report "Something wrong, try again"
+	    severity error;
+	  end if;			
+	wait; 
+		
+    end process;
+	
+end TB;
+</vhdl>
+  <vhdl name="test2">--------------------------------------------------------------------------------&#13;
+-- Project :&#13;
+-- File    :&#13;
+-- Autor   :&#13;
+-- Date    :&#13;
+--&#13;
+--------------------------------------------------------------------------------&#13;
+-- Description :&#13;
+--&#13;
+--------------------------------------------------------------------------------&#13;
+&#13;
+LIBRARY ieee;&#13;
+USE ieee.std_logic_1164.all;&#13;
+&#13;
+ENTITY test2 IS&#13;
+  PORT (&#13;
+  ------------------------------------------------------------------------------&#13;
+  --Insert input ports below&#13;
+    clock      : IN  std_logic;                    -- input bit example&#13;
+    val        : IN  std_logic_vector(3 DOWNTO 0); -- input vector example&#13;
+  ------------------------------------------------------------------------------&#13;
+  --Insert output ports below&#13;
+    max        : OUT std_logic;                    -- output bit example&#13;
+    cpt        : OUT std_logic_vector(3 DOWNTO 0)  -- output vector example&#13;
+    );&#13;
+END test2;&#13;
+&#13;
+--------------------------------------------------------------------------------&#13;
+--Complete your VHDL description below&#13;
+--------------------------------------------------------------------------------&#13;
+&#13;
+ARCHITECTURE TypeArchitecture OF test2 IS&#13;
+&#13;
+BEGIN&#13;
+    max &lt;= not clock;&#13;
+&#13;
+END TypeArchitecture;&#13;
+</vhdl>
+</project>
