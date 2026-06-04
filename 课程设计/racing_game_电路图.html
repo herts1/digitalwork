@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>竖版赛车躲避游戏 — 电路连线可视化</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background: #1a1a2e; color: #eee; }
+  h1 { text-align: center; padding: 20px; background: linear-gradient(135deg, #16213e, #0f3460); }
+  h2 { color: #e94560; margin: 20px 0 10px; padding-left: 20px; border-left: 4px solid #e94560; }
+
+  .tabs { display: flex; background: #16213e; padding: 0 20px; gap: 2px; flex-wrap: wrap; }
+  .tab { padding: 12px 20px; cursor: pointer; background: #0f3460; color: #aaa; border: none; font-size: 14px; transition: .2s; }
+  .tab:hover { color: #fff; background: #1a4080; }
+  .tab.active { color: #fff; background: #e94560; }
+
+  .panel { display: none; padding: 20px; max-width: 1400px; margin: 0 auto; }
+  .panel.active { display: block; }
+
+  .svg-wrap { background: #16213e; border-radius: 12px; padding: 20px; margin: 10px 0; overflow-x: auto; }
+  svg { display: block; margin: 0 auto; }
+
+  .legend { display: flex; gap: 20px; flex-wrap: wrap; padding: 10px 0; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  .legend-swatch { width: 16px; height: 3px; border-radius: 2px; }
+
+  .info-box { background: #0f3460; border-radius: 8px; padding: 15px; margin: 10px 0; font-size: 14px; line-height: 1.8; }
+  .info-box strong { color: #e94560; }
+
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+  th { background: #0f3460; padding: 10px 8px; text-align: left; }
+  td { padding: 8px; border-bottom: 1px solid #333; }
+  tr:hover td { background: rgba(233,69,96,0.1); }
+
+  @media print { body { background: #fff; color: #000; } .tabs { display: none; } .panel { display: block !important; page-break-after: always; } }
+</style>
+</head>
+<body>
+
+<h1>🎮 竖版赛车躲避游戏 — 电路连线可视化 v2 (已修复)</h1>
+
+<div class="info-box" style="max-width:1400px;margin:10px auto;background:#1a3a2e;border-left:4px solid #4f8;padding:12px 20px;font-size:13px;">
+<strong>v2 修复内容 (2026-05-27):</strong><br>
+1. <strong>时钟分频器级联修复:</strong> CNT2_EN = CNT1 Adder Cout, CNT3_EN = CNT2 Adder Cout (之前3个CNT共用CLK,无级联效果)<br>
+2. <strong>速度档位修正:</strong> MUX输入改为CNT1各Q位(16Hz/8Hz/4Hz/2Hz), 系统频率升至32Hz, 扫描刷新更流畅<br>
+3. <strong>FSM状态保持修复:</strong> S1_next = (HIT &amp; S0) | S1, 添加OR门使GAME_OVER状态持续到复位<br>
+4. <strong>FSM START接线修复:</strong> 添加两级AND级联(560,360)+(620,400), 解决START与!S1短路问题<br>
+5. <strong>计分触发修复:</strong> SCORE_TRIG = AT_BOTTOM &amp; !HIT &amp; S0, 添加级联AND确保只在RUNNING状态计分<br>
+6. <strong>显示控制器增强:</strong> 添加16位宽AND/OR门实现行列选通, CAR和OBS数据仅在匹配行显示<br>
+7. <strong>使能信号修复:</strong> CAR_POS/OBS_COL/OBS_ROW/OBS_SRC的EN改为由S0(RUNNING状态)控制<br>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab(0)">整体架构图</button>
+  <button class="tab" onclick="switchTab(1)">模块1: 时钟分频器</button>
+  <button class="tab" onclick="switchTab(2)">模块2-3: 列源 &amp; 小车控制</button>
+  <button class="tab" onclick="switchTab(3)">模块4: 障碍物管理</button>
+  <button class="tab" onclick="switchTab(4)">模块5-6: 碰撞 &amp; FSM</button>
+  <button class="tab" onclick="switchTab(5)">模块7-8: 计分 &amp; 显示</button>
+  <button class="tab" onclick="switchTab(6)">模块9: 输出设备 &amp; 复位总线</button>
+  <button class="tab" onclick="switchTab(7)">元件坐标总表</button>
+</div>
+
+<!-- ============ PANEL 0: 整体架构图 ============ -->
+<div class="panel active" id="panel0">
+<h2>整体架构图 — 数据流与模块连接</h2>
+<div class="legend">
+  <span class="legend-item"><span class="legend-swatch" style="background:#0ff"></span> 时钟信号</span>
+  <span class="legend-item"><span class="legend-swatch" style="background:#f0f"></span> 数据总线 (4位)</span>
+  <span class="legend-item"><span class="legend-swatch" style="background:#ff0"></span> 控制信号</span>
+  <span class="legend-item"><span class="legend-swatch" style="background:#0f0"></span> 状态信号</span>
+  <span class="legend-item"><span class="legend-swatch" style="background:#f66"></span> 复位信号</span>
+</div>
+<div class="svg-wrap">
+<svg viewBox="0 0 1200 900" width="1200" height="900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowCyan" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#0ff"/></marker>
+    <marker id="arrowMag" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#f0f"/></marker>
+    <marker id="arrowYel" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#ff0"/></marker>
+    <marker id="arrowGrn" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#0f0"/></marker>
+    <marker id="arrowRed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#f66"/></marker>
+    <filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+
+  <!-- 模块框: (x, y, w, h, color, label) -->
+  <!-- M0: 时钟与输入 (左) -->
+  <rect x="20" y="50" width="160" height="340" rx="10" fill="#1a3a5c" stroke="#0ff" stroke-width="2"/>
+  <text x="100" y="75" text-anchor="middle" fill="#0ff" font-size="14" font-weight="bold">时钟与输入设备</text>
+  <text x="35" y="100" fill="#aaa" font-size="11">CLK (80,40)</text>
+  <text x="35" y="120" fill="#aaa" font-size="11">LEFT 按钮 (80,120)</text>
+  <text x="35" y="140" fill="#aaa" font-size="11">RIGHT 按钮 (80,190)</text>
+  <text x="35" y="160" fill="#aaa" font-size="11">START 按钮 (80,260)</text>
+  <text x="35" y="180" fill="#aaa" font-size="11">RST 按钮 (80,330)</text>
+  <text x="35" y="200" fill="#aaa" font-size="11">SPEED0 (80,420)</text>
+  <text x="35" y="220" fill="#aaa" font-size="11">SPEED1 (80,450)</text>
+  <text x="35" y="250" fill="#aaa" font-size="11">EN_CONST (110,40)</text>
+  <text x="35" y="270" fill="#aaa" font-size="11">CNT_CONST (70,40)</text>
+
+  <!-- M1: 时钟分频器 -->
+  <rect x="240" y="10" width="200" height="160" rx="10" fill="#1a3a5c" stroke="#0ff" stroke-width="2"/>
+  <text x="340" y="35" text-anchor="middle" fill="#0ff" font-size="14" font-weight="bold">M1: 时钟分频器</text>
+  <text x="255" y="60" fill="#aaa" font-size="11">ADD1(130,30) CNT1(200,30)</text>
+  <text x="255" y="80" fill="#aaa" font-size="11">ADD2(260,30) CNT2(330,30)</text>
+  <text x="255" y="100" fill="#aaa" font-size="11">ADD3(390,30) CNT3(460,30)</text>
+  <text x="255" y="120" fill="#aaa" font-size="11">SPD_MUX(560,60) 4档速度</text>
+  <text x="255" y="145" fill="#0f0" font-size="11">→ TICK 输出 (630,85)</text>
+
+  <!-- M2: 障碍物列源 -->
+  <rect x="240" y="200" width="200" height="110" rx="10" fill="#1a3a5c" stroke="#f0f" stroke-width="2"/>
+  <text x="340" y="225" text-anchor="middle" fill="#f0f" font-size="14" font-weight="bold">M2: 障碍物列源</text>
+  <text x="255" y="250" fill="#aaa" font-size="11">OBS_ADD(130,140)</text>
+  <text x="255" y="270" fill="#aaa" font-size="11">OBS_SRC Reg(200,140)</text>
+  <text x="255" y="290" fill="#aaa" font-size="11">STEP3=3, 模16回绕</text>
+
+  <!-- M3: 小车控制器 -->
+  <rect x="240" y="340" width="200" height="180" rx="10" fill="#1a3a5c" stroke="#f0f" stroke-width="2"/>
+  <text x="340" y="365" text-anchor="middle" fill="#f0f" font-size="14" font-weight="bold">M3: 小车控制器</text>
+  <text x="255" y="390" fill="#aaa" font-size="11">CAR_ADD(130,250)</text>
+  <text x="255" y="410" fill="#aaa" font-size="11">CAR_POS Reg(200,250)</text>
+  <text x="255" y="430" fill="#aaa" font-size="11">MV_MUX(200,320) +1/-1/0</text>
+  <text x="255" y="450" fill="#aaa" font-size="11">CMP_LO(360,230) &gt;0</text>
+  <text x="255" y="470" fill="#aaa" font-size="11">CMP_HI(360,280) &lt;15</text>
+  <text x="255" y="490" fill="#aaa" font-size="11">AND_L(450,230) AND_R(450,280)</text>
+  <text x="255" y="510" fill="#0f0" font-size="11">→ CAR_COL 输出 (530,250)</text>
+
+  <!-- M4: 障碍物管理 -->
+  <rect x="500" y="200" width="220" height="200" rx="10" fill="#1a3a5c" stroke="#f0f" stroke-width="2"/>
+  <text x="610" y="225" text-anchor="middle" fill="#f0f" font-size="14" font-weight="bold">M4: 障碍物管理</text>
+  <text x="515" y="250" fill="#aaa" font-size="11">OBS_COL Reg(200,480)</text>
+  <text x="515" y="270" fill="#aaa" font-size="11">OBS_ROW Reg(400,480)</text>
+  <text x="515" y="290" fill="#aaa" font-size="11">ROW_ADD(330,480)</text>
+  <text x="515" y="310" fill="#aaa" font-size="11">ROW_CMP(400,560) ==15?</text>
+  <text x="515" y="340" fill="#0f0" font-size="11">→ OBS_COL (530,480)</text>
+  <text x="515" y="360" fill="#0f0" font-size="11">→ OBS_ROW (530,520)</text>
+  <text x="515" y="380" fill="#0f0" font-size="11">→ AT_BOTTOM (530,580)</text>
+
+  <!-- M5: 碰撞检测 -->
+  <rect x="500" y="430" width="220" height="100" rx="10" fill="#1a3a5c" stroke="#ff0" stroke-width="2"/>
+  <text x="610" y="455" text-anchor="middle" fill="#ff0" font-size="14" font-weight="bold">M5: 碰撞检测</text>
+  <text x="515" y="480" fill="#aaa" font-size="11">COL_CMP(620,250) 列比较</text>
+  <text x="515" y="500" fill="#aaa" font-size="11">HIT_AND(720,300)</text>
+  <text x="515" y="520" fill="#0f0" font-size="11">→ HIT (820,300)</text>
+
+  <!-- M6: 游戏状态机 -->
+  <rect x="780" y="10" width="220" height="200" rx="10" fill="#1a3a5c" stroke="#ff0" stroke-width="2"/>
+  <text x="890" y="35" text-anchor="middle" fill="#ff0" font-size="14" font-weight="bold">M6: 游戏状态机</text>
+  <text x="795" y="60" fill="#aaa" font-size="11">FF_S1(700,60) FF_S0(700,160)</text>
+  <text x="795" y="80" fill="#aaa" font-size="11">NOT_S1(580,400) NOT_S0(580,440)</text>
+  <text x="795" y="100" fill="#aaa" font-size="11">AND_START(620,400)</text>
+  <text x="795" y="120" fill="#aaa" font-size="11">AND_KEEP(700,400)</text>
+  <text x="795" y="140" fill="#aaa" font-size="11">OR_S0(660,480)</text>
+  <text x="795" y="160" fill="#aaa" font-size="11">AND_S1(780,480)</text>
+  <text x="795" y="185" fill="#0f0" font-size="11">→ S1(880,60) S0(880,160)</text>
+
+  <!-- M7: 计分器 -->
+  <rect x="780" y="240" width="220" height="150" rx="10" fill="#1a3a5c" stroke="#0f0" stroke-width="2"/>
+  <text x="890" y="265" text-anchor="middle" fill="#0f0" font-size="14" font-weight="bold">M7: 计分器</text>
+  <text x="795" y="290" fill="#aaa" font-size="11">SCORE1 Reg(700,560) 个位</text>
+  <text x="795" y="310" fill="#aaa" font-size="11">SCORE10 Reg(700,640) 十位</text>
+  <text x="795" y="330" fill="#aaa" font-size="11">CMP9(560,680) 进位检测</text>
+  <text x="795" y="355" fill="#aaa" font-size="11">DISP1(860,560) DISP10(860,630)</text>
+
+  <!-- M8: 显示控制器 -->
+  <rect x="780" y="420" width="220" height="150" rx="10" fill="#1a3a5c" stroke="#0f0" stroke-width="2"/>
+  <text x="890" y="445" text-anchor="middle" fill="#0f0" font-size="14" font-weight="bold">M8: 显示控制器</text>
+  <text x="795" y="470" fill="#aaa" font-size="11">SCAN_ROW Reg(200,620)</text>
+  <text x="795" y="490" fill="#aaa" font-size="11">CMP_14(400,620) CMP_15(400,670)</text>
+  <text x="795" y="510" fill="#aaa" font-size="11">CMP_OBS(400,720)</text>
+  <text x="795" y="530" fill="#aaa" font-size="11">DEC_CAR(560,620) DEC_OBS(560,700)</text>
+  <text x="795" y="550" fill="#aaa" font-size="11">LED Matrix 16×16 (900,640)</text>
+
+  <!-- M9: 输出设备 -->
+  <rect x="780" y="600" width="220" height="90" rx="10" fill="#1a3a5c" stroke="#f66" stroke-width="2"/>
+  <text x="890" y="625" text-anchor="middle" fill="#f66" font-size="14" font-weight="bold">M9: 输出设备</text>
+  <text x="795" y="650" fill="#aaa" font-size="11">LED_RUN(980,250) 绿灯</text>
+  <text x="795" y="670" fill="#aaa" font-size="11">LED_GO(980,320) 红灯</text>
+  <text x="795" y="690" fill="#aaa" font-size="11">BUZZ(980,400) 蜂鸣器</text>
+
+  <!-- === 数据流连线 === -->
+  <!-- CLK → 各模块 (青色) -->
+  <line x1="180" y1="90" x2="240" y2="90" stroke="#0ff" stroke-width="2" marker-end="url(#arrowCyan)"/>
+  <line x1="100" y1="390" x2="780" y2="390" stroke="#0ff" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="400" y="385" fill="#0ff" font-size="10">CLK 信号 → 所有寄存器</text>
+
+  <!-- TICK → 各模块 (青色) -->
+  <line x1="440" y1="130" x2="440" y2="250" stroke="#0ff" stroke-width="2"/>
+  <line x1="440" y1="250" x2="500" y2="250" stroke="#0ff" stroke-width="2"/>
+  <line x1="440" y1="250" x2="500" y2="420" stroke="#0ff" stroke-width="2"/>
+  <text x="445" y="200" fill="#0ff" font-size="10">TICK →</text>
+
+  <!-- OBS_SRC → OBS_COL (紫色) -->
+  <line x1="340" y1="310" x2="340" y2="500" stroke="#f0f" stroke-width="2" marker-end="url(#arrowMag)"/>
+  <line x1="340" y1="500" x2="500" y2="500" stroke="#f0f" stroke-width="2"/>
+  <text x="345" y="410" fill="#f0f" font-size="10">OBS_SRC[3:0] → OBS_COL.D</text>
+
+  <!-- CAR_COL → 碰撞 & 显示 (紫色) -->
+  <line x1="440" y1="430" x2="500" y2="430" stroke="#f0f" stroke-width="2" marker-end="url(#arrowMag)"/>
+  <line x1="500" y1="430" x2="500" y2="460" stroke="#f0f" stroke-width="2"/>
+  <text x="445" y="425" fill="#f0f" font-size="10">CAR_COL</text>
+
+  <!-- OBS_COL, OBS_ROW, AT_BOTTOM → 碰撞 (紫色) -->
+  <line x1="720" y1="300" x2="780" y2="300" stroke="#f0f" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="720" y1="340" x2="780" y2="340" stroke="#f0f" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="720" y1="380" x2="780" y2="380" stroke="#f0f" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+  <!-- HIT → FSM (黄色) -->
+  <line x1="720" y1="480" x2="780" y2="480" stroke="#ff0" stroke-width="2" marker-end="url(#arrowYel)"/>
+  <text x="730" y="475" fill="#ff0" font-size="10">HIT →</text>
+
+  <!-- LEFT/RIGHT → 小车控制 (黄色) -->
+  <line x1="180" y1="140" x2="240" y2="140" stroke="#ff0" stroke-width="1.5" marker-end="url(#arrowYel)"/>
+  <line x1="180" y1="210" x2="240" y2="210" stroke="#ff0" stroke-width="1.5" marker-end="url(#arrowYel)"/>
+  <text x="190" y="135" fill="#ff0" font-size="10">LEFT</text>
+  <text x="190" y="205" fill="#ff0" font-size="10">RIGHT</text>
+
+  <!-- START → FSM (黄色) -->
+  <line x1="180" y1="280" x2="780" y2="280" stroke="#ff0" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="450" y="275" fill="#ff0" font-size="10">START → FSM</text>
+
+  <!-- 状态 → LED/Buzzer (绿色) -->
+  <line x1="890" y1="210" x2="890" y2="240" stroke="#0f0" stroke-width="1.5" marker-end="url(#arrowGrn)"/>
+  <text x="895" y="230" fill="#0f0" font-size="10">S1,S0 → 计分</text>
+  <line x1="890" y1="210" x2="890" y2="600" stroke="#0f0" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="895" y="400" fill="#0f0" font-size="10">GAMEOVER → LED+Buzzer</text>
+
+  <!-- 复位总线 (红色) -->
+  <line x1="100" y1="390" x2="100" y2="720" stroke="#f66" stroke-width="3" stroke-dasharray="8,4"/>
+  <line x1="100" y1="720" x2="1000" y2="720" stroke="#f66" stroke-width="3" stroke-dasharray="8,4"/>
+  <text x="400" y="715" fill="#f66" font-size="12" font-weight="bold">RST 复位总线 → 所有寄存器 CLR</text>
+
+  <!-- 图例底部 -->
+  <rect x="20" y="780" width="1160" height="100" rx="8" fill="#0f3460" opacity="0.5"/>
+  <text x="600" y="810" text-anchor="middle" fill="#fff" font-size="16" font-weight="bold">游戏状态流转: IDLE(00) → START → RUNNING(01) → HIT → GAME_OVER(10) → RST → IDLE(00)</text>
+  <text x="600" y="840" text-anchor="middle" fill="#aaa" font-size="13">速度档: SPEED[1:0]=00(最快≈16Hz) 01(≈8Hz) 10(≈4Hz) 11(≈2Hz) | 系统时钟 32Hz | CNT级联: Cout→EN链</text>
+  <text x="600" y="865" text-anchor="middle" fill="#aaa" font-size="13">计分: 障碍物安全通过+1分, 最大99分, 7段数码管显示 | 碰撞 → Game Over → 红灯+蜂鸣</text>
+</svg>
+</div>
+</div>
+
+<!-- ============ PANEL 1: 时钟分频器 ============ -->
+<div class="panel" id="panel1">
+<h2>模块1: 时钟分频器 (产生 GAME_TICK)</h2>
+<div class="info-box">
+  <strong>功能:</strong> 3级×16分频(Cout→EN级联)，总分频比4096。MUX选择CNT1不同位输出，实现4档游戏速度。<br>
+  <strong>输入:</strong> CLK(系统时钟), SPEED0, SPEED1, EN_CONST<br>
+  <strong>输出:</strong> TICK (游戏时钟)
+</div>
+<div class="svg-wrap">
+<svg viewBox="0 0 750 200" width="750" height="200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="ac1" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#0ff"/></marker>
+    <marker id="ac2" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#ff0"/></marker>
+  </defs>
+
+  <!-- CNT1 -->
+  <rect x="140" y="30" width="80" height="60" rx="6" fill="#1a3a5c" stroke="#0ff" stroke-width="1.5"/>
+  <text x="180" y="55" text-anchor="middle" fill="#fff" font-size="12">CNT1</text>
+  <text x="180" y="72" text-anchor="middle" fill="#aaa" font-size="10">Reg(200,30)</text>
+
+  <!-- ADD1 -->
+  <rect x="70" y="35" width="55" height="50" rx="6" fill="#1a5c3a" stroke="#0f0" stroke-width="1.5"/>
+  <text x="97" y="58" text-anchor="middle" fill="#fff" font-size="11">ADD1</text>
+  <text x="97" y="73" text-anchor="middle" fill="#aaa" font-size="9">(130,30)</text>
+
+  <!-- CNT2 -->
+  <rect x="270" y="30" width="80" height="60" rx="6" fill="#1a3a5c" stroke="#0ff" stroke-width="1.5"/>
+  <text x="310" y="55" text-anchor="middle" fill="#fff" font-size="12">CNT2</text>
+  <text x="310" y="72" text-anchor="middle" fill="#aaa" font-size="10">Reg(330,30)</text>
+
+  <!-- ADD2 -->
+  <rect x="200" y="35" width="55" height="50" rx="6" fill="#1a5c3a" stroke="#0f0" stroke-width="1.5"/>
+  <text x="227" y="58" text-anchor="middle" fill="#fff" font-size="11">ADD2</text>
+  <text x="227" y="73" text-anchor="middle" fill="#aaa" font-size="9">(260,30)</text>
+
+  <!-- CNT3 -->
+  <rect x="400" y="30" width="80" height="60" rx="6" fill="#1a3a5c" stroke="#0ff" stroke-width="1.5"/>
+  <text x="440" y="55" text-anchor="middle" fill="#fff" font-size="12">CNT3</text>
+  <text x="440" y="72" text-anchor="middle" fill="#aaa" font-size="10">Reg(460,30)</text>
+
+  <!-- ADD3 -->
+  <rect x="330" y="35" width="55" height="50" rx="6" fill="#1a5c3a" stroke="#0f0" stroke-width="1.5"/>
+  <text x="357" y="58" text-anchor="middle" fill="#fff" font-size="11">ADD3</text>
+  <text x="357" y="73" text-anchor="middle" fill="#aaa" font-size="9">(390,30)</text>
+
+  <!-- MUX -->
+  <rect x="530" y="25" width="80" height="70" rx="6" fill="#5c3a1a" stroke="#ff0" stroke-width="1.5"/>
+  <text x="570" y="50" text-anchor="middle" fill="#fff" font-size="12">SPD_MUX</text>
+  <text x="570" y="67" text-anchor="middle" fill="#aaa" font-size="10">(560,60)</text>
+  <text x="570" y="82" text-anchor="middle" fill="#aaa" font-size="9">w=1 sel=2</text>
+
+  <!-- TICK 输出 -->
+  <rect x="650" y="35" width="70" height="50" rx="6" fill="#1a5c3a" stroke="#0f0" stroke-width="1.5"/>
+  <text x="685" y="58" text-anchor="middle" fill="#fff" font-size="12">TICK</text>
+  <text x="685" y="73" text-anchor="middle" fill="#aaa" font-size="10">(630,85)</text>
+
+  <!-- CONST 1 -->
+  <rect x="15" y="45" width="40" height="35" rx="4" fill="#333" stroke="#fff" stroke-width="1"/>
+  <text x="35" y="67" text-anchor="middle" fill="#fff" font-size="11">Const1</text>
+
+  <!-- 连线: Q反馈 → Adder.A -->
+  <path d="M220,55 L240,55 L240,75 L125,75" stroke="#f0f" stroke-width="1.5" fill="none" marker-end="url(#ac1)"/>
+  <path d="M350,55 L380,55 L380,75 L255,75" stroke="#f0f" stroke-width="1.5" fill="none" marker-end="url(#ac1)"/>
+  <path d="M480,55 L500,55 L500,75 L385,75" stroke="#f0f" stroke-width="1.5" fill="none" marker-end="url(#ac1)"/>
+
+  <!-- Const1 → Adder.B -->
+  <line x1="55" y1="65" x2="125" y2="65" stroke="#fff" stroke-width="1.5"/>
+  <line x1="55" y1="65" x2="255" y2="65" stroke="#fff" stroke-width="1.5"/>
+  <line x1="55" y1="65" x2="385" y2="65" stroke="#fff" stroke-width="1.5"/>
+
+  <!-- Adder.SUM → Reg.D -->
+  <line x1="125" y1="55" x2="140" y2="55" stroke="#0f0" stroke-width="1.5" marker-end="url(#ac2)"/>
+  <line x1="255" y1="55" x2="270" y2="55" stroke="#0f0" stroke-width="1.5" marker-end="url(#ac2)"/>
+  <line x1="385" y1="55" x2="400" y2="55" stroke="#0f0" stroke-width="1.5" marker-end="url(#ac2)"/>
+
+  <!-- CNT3.Q → MUX inputs -->
+  <line x1="480" y1="45" x2="530" y2="40" stroke="#f0f" stroke-width="1.5"/>
+  <line x1="480" y1="50" x2="530" y2="50" stroke="#f0f" stroke-width="1.5"/>
+  <line x1="480" y1="55" x2="530" y2="60" stroke="#f0f" stroke-width="1.5"/>
+  <line x1="480" y1="60" x2="530" y2="70" stroke="#f0f" stroke-width="1.5"/>
+
+  <!-- MUX.out → TICK -->
+  <line x1="610" y1="55" x2="650" y2="55" stroke="#0f0" stroke-width="1.5" marker-end="url(#ac2)"/>
+
+  <!-- CLK 标注 -->
+  <text x="180" y="145" fill="#0ff" font-size="11">CLK → 所有 Reg.CLK (系统时钟 8Hz)</text>
+  <text x="180" y="165" fill="#ff0" font-size="11">SPEED[1:0] → MUX.sel (速度选择)</text>
+  <text x="450" y="165" fill="#f0f" font-size="11">CNT3.Q[0]=最快 [1]=快 [2]=慢 [3]=最慢</text>
+
+  <!-- 分频比标注 -->
+  <text x="100" y="100" fill="#aaa" font-size="10">÷16</text>
+  <text x="230" y="100" fill="#aaa" font-size="10">÷16</text>
+  <text x="360" y="100" fill="#aaa" font-size="10">÷16</text>
+  <text x="570" y="100" fill="#aaa" font-size="10">总÷4096</text>
+</svg>
+</div>
+</div>
+
+<!-- ============ PANEL 2: 列源 & 小车控制 ============ -->
+<div class="panel" id="panel2">
+<h2>模块2: 障碍物列源 + 模块3: 小车控制器</h2>
+<div class="svg-wrap">
+<svg viewBox="0 0 800 520" width="800" height="520" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="am1" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#f0f"/></marker>
+    <marker id="ay1" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#ff0"/></marker>
+  </defs>
+
+  <!-- === 列源区域 (上) === -->
+  <text x="20" y="25" fill="#f0f" font-size="15" font-weight="bold">▎模块2: 障碍物列源发生器</text>
+
+  <rect x="20" y="40" width="80" height="50" rx="6" fill="#333" stroke="#fff" stroke-width="1"/>
+  <text x="60" y="62" text-anchor="middle" fill="#fff" font-size="11">STEP3</text>
+  <text x="60" y="78" text-anchor="middle" fill="#aaa" font-size="9">Const(70,160)</text>
+
+  <rect x="140" y="40" width="65" height="50" rx="6" fill="#1a5c3a" stroke="#0f0" stroke-width="1.5"/>
+  <text x="172" y="62" text-anchor="middle" fill="#fff" font-size="11">OBS_ADD</text>
+  <text x="172" y="78" text-anchor="middle" fill="#aaa" font-size="9">(130,140)</text>
+
+  <rect x="260" y="35" width="90" height="60" rx="6" fill="#1a3a5c" stroke="#0ff" stroke-width="1.5"/>
+  <text x="305" y="58" text-anchor="middle" fill="#fff" font-size="12">OBS_SRC</text>
+  <text x="305" y="75" text-anchor="middle" fill="#aaa" font-size="10">Reg(200,140)</text>
+
+  <rect x="400" y="45" width="70" height="40" rx="4" fill="#1a5c3a" stroke="#0f0" stroke-width="1.5"/>
+  <text x="435" y="62" text-anchor="middle" fill="#fff" font-size="11">SRC_PIN</text>
+  <text x="435" y="77" text-anchor="middle" fill="#aaa" font-size="9">(350,150)</text>
+
+  <!-- 连线 -->
+  <line x1="350" y1="55" x2="350" y2="100" stroke="#f0f" stroke-width="1.5"/>
+  <line x1="350" y1="100" x2="205" y2="100" stroke="#f0f" stroke-width="1.5" marker-end="url(#am1)"/>
+  <text x="270" y="115" fill="#f0f" font-size="10">OBS_SRC.Q → OBS_ADD.A (反馈)</text>
+
+  <line x1="100" y1="65" x2="140" y2="65" stroke="#fff" stroke-width="1.5"/>
+  <text x="110" y="55" fill="#aaa" font-size="9">+3</text>
+
+  <line x1="205" y1="65" x2="260" y2="65" stroke="#0f0" stroke-width="1.5" marker-end="url(#ay1)"/>
+  <text x="225" y="55" fill="#aaa" font-size="9">SUM→D</text>
+
+  <line x1="350" y1="65" x2="400" y2="65" stroke="#f0f" stroke-width="1.5"/>
+  <text x="370" y="55" fill="#aaa" font-size="9">输出</text>
+
+  <text x="260" y="130" fill="#aaa" font-size="11">每个TICK递增3, 4位自动模16回绕: 0→3→6→9→12→15→2→5...</text>
+
+  <!-- === 小车控制区域 (下) === -->
+  <text x="20" y="175" fill="#f0f" font-size="15" font-weight="bold">▎模块3: 小车控制器</text>
+
+  <!-- 按钮 -->
+  <rect x="20" y="195" width="55" height="30" rx="5" fill="#5c1a1a" stroke="#f66" stroke-width="1"/>
+  <text x="47" y="215" text-anchor="middle" fill="#fff" font-size="10">LEFT</text>
+
+  <rect x="20" y="245" width="55" height="30" rx="5" fill="#1a5c1a" stroke="#0f0" stroke-width="1"/>
+  <text x="47" y="265" text-anchor="middle" fill="#fff" font-size="10">RIGHT</text>
+
+  <!-- 边界比较器 -->
+  <rect x="430" y="195" width="90" height="45" rx="6" fill="#5c3a1a" stroke="#ff0" stroke-width="1.5"/>
+  <text x="475" y="215" text-anchor="middle" fill="#fff" font-size="11">CMP_LO</text>
+  <text x="475" y="232" text-anchor="middle" fill="#aaa" font-size="9">pos &gt; 0 ?</text>
+
+  <rect x="430" y="260" width="90" height="45" rx="6" fill="#5c3a1a" stroke="#ff0" stroke-width="1.5"/>
+  <text x="475" y="280" text-anchor="middle" fill="#fff" font-size="11">CMP_HI</text>
+  <text x="475" y="297" text-anchor="middle" fill="#aaa" font-size="9">pos &lt; 15 ?</text>
+
+  <!-- AND 门 -->
+  <rect x="555" y="195" width="55" height="35" rx="4" fill="#3a3a1a" stroke="#ff0" stroke-width="1"/>
+  <text x="582" y="210" text-anchor="middle" fill="#fff" font-size="10">AND_L</text>
+  <text x="582" y="224" text-anchor="middle" fill="#aaa" font-size="8">(450,230)</text>
+
+  <rect x="555" y="265" width="55" height="35" rx="4" fill="#3a3a1a" stroke="#ff0" stroke-width="1"/>
+  <text x="582" y="280" text-anchor="middle" fill="#fff" font-size="10">AND_R</text>
+  <text x="582" y="294" text-anchor="middle" fill="#aaa" font-size="8">(450,280)</text>
+
+  <!-- MUX -->
+  <rect x="140" y="340" width="90" height="70" rx="6" fill="#5c3a1a" stroke="#ff0" stroke-width="1.5"/>
+  <text x="185" y="362" text-anchor="middle" fill="#fff" font-size="12">MV_MUX</text>
+  <text x="185" y="380" text-anchor="middle" fill="#aaa" font-size="10">(200,320)</text>
+  <text x="185" y="397" text-anchor="middle" fill="#aaa" font-size="9">w=4 sel=2</text>
+
+  <!-- 常数 -->
+  <rect x="20" y="345" width="55" height="25" rx="4" fill="#333" stroke="#fff" stroke-width="1"/>
+  <text x="47" y="362" text-anchor="middle" fill="#fff" font-size="10">+1 (0x1)</text>
+  <rect x="20" y="380" width="55" height="25" rx="4" fill="#333" stroke="#fff" stroke-width="1"/>
+  <text x="47" y="397" text-anchor="middle" fill="#fff" font-size="10">-1 (0xf)</text>
+  <rect x="20" y="415" width="55" height="25" rx="4" fill="#333" stroke="#fff" stroke-width="1"/>
+  <text x="47" y="432" text-anchor="middle" fill="#fff" font-size="10">0</text>
+
+  <!-- CAR_ADD + CAR_POS -->
+  <rect x="270" y="340" width="65" height="50" rx="6" fill="#1a5c3a" stroke="#0f0" stroke-width="1.5"/>
+  <text x="302" y="362" text-anchor="middle" fill="#fff" font-size="11">CAR_ADD</text>
+  <text x="302" y="378" text-anchor="middle" fill="#aaa" font-size="9">(130,250)</text>
+
+  <rect x="380" y="335" width="90" height="60" rx="6" fill="#1a3a5c" stroke="#0ff" stroke-width="1.5"/>
+  <text x="425" y="358" text-anchor="middle" fill="#fff" font-size="12">CAR_POS</text>
+  <text x="425" y="375" text-anchor="middle" fill="#aaa" font-size="10">Reg(200,250)</text>
+
+  <!-- CAR_COL 输出 -->
+  <rect x="530" y="350" width="70" height="40" rx="4" fill="#1a5c3a" stroke="#0f0" stroke-width="1.5"/>
+  <text x="565" y="367" text-anchor="middle" fill="#fff" font-size="11">CAR_COL</text>
+  <text x="565" y="382" text-anchor="middle" fill="#aaa" font-size="9">(530,250)</text>
+
+  <!-- 连线: CAR_POS.Q → 比较器 -->
+  <line x1="470" y1="345" x2="475" y2="240" stroke="#f0f" stroke-width="1.5"/>
+  <text x="490" y="290" fill="#aaa" font-size="9" transform="rotate(-90,490,290)">CAR_POS.Q</text>
+
+  <!-- 比较器 → AND门 -->
+  <line x1="520" y1="217" x2="555" y2="217" stroke="#0f0" stroke-width="1.5"/>
+  <line x1="520" y1="282" x2="555" y2="282" stroke="#0f0" stroke-width="1.5"/>
+
+  <!-- LEFT/RIGHT → AND -->
+  <line x1="75" y1="210" x2="555" y2="230" stroke="#f66" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="75" y1="260" x2="555" y2="270" stroke="#0f0" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+  <!-- AND → MUX sel -->
+  <line x1="610" y1="217" x2="650" y2="355" stroke="#ff0" stroke-width="1.5"/>
+  <line x1="610" y1="282" x2="660" y2="370" stroke="#ff0" stroke-width="1.5"/>
+  <text x="640" y="290" fill="#ff0" font-size="9">sel0, sel1</text>
+
+  <!-- 常数 → MUX -->
+  <line x1="75" y1="357" x2="140" y2="357" stroke="#fff" stroke-width="1.5"/>
+  <line x1="75" y1="392" x2="140" y2="370" stroke="#fff" stroke-width="1.5"/>
+  <line x1="75" y1="427" x2="140" y2="383" stroke="#fff" stroke-width="1.5"/>
+
+  <!-- MUX.out → CAR_ADD.B -->
+  <line x1="230" y1="370" x2="270" y2="370" stroke="#ff0" stroke-width="1.5"/>
+
+  <!-- CAR_POS.Q → CAR_ADD.A -->
+  <line x1="380" y1="365" x2="335" y2="365" stroke="#f0f" stroke-width="1.5"/>
+
+  <!-- CAR_ADD.SUM → CAR_POS.D -->
+  <line x1="335" y1="365" x2="380" y2="365" stroke="#0f0" stroke-width="1.5"/>
+
+  <!-- CAR_POS.Q → 输出 -->
+  <line x1="470" y1="365" x2="530" y2="365" stroke="#f0f" stroke-width="1.5"/>
+
+  <text x="20" y="485" fill="#aaa" font-size="11">移动逻辑: LEFT &amp; (pos&gt;0) → 加-1(0xF) | RIGHT &amp; (pos&lt;15) → 加+1 | 其他 → 加0(保持)</text>
+</svg>
+</div>
+</div>
+
+<!-- ============ PANEL 3: 障碍物管理 ============ -->
+<div class="panel" id="panel3">
+<h2>模块4: 障碍物位置管理</h2>
+<div class="svg-wrap">
+<svg viewBox="0 0 750 350" width="750" height="350" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="am3" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#f0f"/></marker>
+  </defs>
+
+  <!-- OBS_COL Register -->
+  <rect x="20" y="60" width="90" height="60" rx="6" fill="#1a3a5c" stroke="#0ff" stroke-width="1.5"/>
+  <text x="65" y="83" text-anchor="middle" fill="#fff" font-size="12">OBS_COL</text>
+  <text x="65" y="100" text-anchor="middle" fill="#aaa" font-size="10">Reg(200,480)</text>
+
+  <!-- OBS_ROW Register -->
+  <rect x="260" y="60" width="90" height="60" rx="6" fill="#1a3a5c" stroke="#0ff" stroke-width="1.5"/>
+  <text x="305" y="83" text-anchor="middle" fill="#fff" font-size="12">OBS_ROW</text>
+  <text x="305" y="100" text-anchor="middle" fill="#aaa" font-size="10">Reg(400,480)</text>
+
+  <!-- ROW_ADD -->
+  <rect x="170" y="70" width="65" height="45" rx="6" fill="#1a5c3a" stroke="#0f0" stroke-width="1.5"/>
+  <text x="202" y="90" text-anchor="middle" fill="#fff" font-size="11">ROW_ADD</text>
+  <text x="202" y="105" text-anchor="middle" fill="#aaa" font-size="9">(330,480)</text>
+
+  <!-- ROW_CMP -->
+  <rect x="400" y="60" width="90" height="60" rx="6" fill="#5c3a1a" stroke="#ff0" stroke-width="1.5"/>
+  <text x="445" y="83" text-anchor="middle" fill="#fff" font-size="12">ROW_CMP</text>
+  <text x="445" y="100" text-anchor="middle" fill="#aaa" font-size="10">(400,560)</text>
+
+  <!-- CONST15 -->
+  <rect x="410" y="140" width="70" height="35" rx="4" fill="#333" stroke="#fff" stroke-width="1"/>
+  <text x="445" y="162" text-anchor="middle" fill="#fff" font-size="11">Const 15</text>
+
+  <!-- 输出引脚 -->
+  <rect x="540" y="50" width="80" height="35" rx="4" fill="#1a5c3a" stroke="#0f0" stroke-width="1.5"/>
+  <text x="580" y="65" text-anchor="middle" fill="#fff" font-size="11">OBS_COL</text>
+  <text x="580" y="78" text-anchor="middle" fill="#aaa" font-size="9">(530,480)</text>
+
+  <rect x="540" y="105" width="80" height="35" rx="4" fill="#1a5c3a" stroke="#0f0" stroke-width="1.5"/>
+  <text x="580" y="120" text-anchor="middle" fill="#fff" font-size="11">OBS_ROW</text>
+  <text x="580" y="133" text-anchor="middle" fill="#aaa" font-size="9">(530,520)</text>
+
+  <rect x="540" y="160" width="80" height="35" rx="4" fill="#1a5c3a" stroke="#0f0" stroke-width="1.5"/>
+  <text x="580" y="175" text-anchor="middle" fill="#fff" font-size="11">AT_BOTTOM</text>
+  <text x="580" y="188" text-anchor="middle" fill="#aaa" font-size="9">(530,580)</text>
+
+  <!-- TICK 输入 -->
+  <rect x="120" y="170" width="60" height="30" rx="4" fill="#333" stroke="#0ff" stroke-width="1"/>
+  <text x="150" y="190" text-anchor="middle" fill="#0ff" font-size="11">TICK</text>
+
+  <!-- 连线 -->
+  <line x1="110" y1="90" x2="170" y2="90" stroke="#f0f" stroke-width="1.5"/>
+  <line x1="350" y1="90" x2="400" y2="90" stroke="#f0f" stroke-width="1.5"/>
+
+  <!-- OBS_SRC → OBS_COL.D -->
+  <line x1="65" y1="50" x2="65" y2="30" stroke="#f0f" stroke-width="1.5"/>
+  <text x="10" y="25" fill="#f0f" font-size="10">来自 OBS_SRC.Q</text>
+
+  <!-- ROW 反馈 -->
+  <line x1="350" y1="100" x2="350" y2="115" stroke="#f0f" stroke-width="1.5"/>
+  <line x1="350" y1="115" x2="235" y2="115" stroke="#f0f" stroke-width="1.5" marker-end="url(#am3)"/>
+  <text x="280" y="130" fill="#f0f" font-size="9">ROW.Q → ADD.A (反馈)</text>
+
+  <!-- ADD → ROW.D -->
+  <line x1="235" y1="90" x2="260" y2="90" stroke="#0f0" stroke-width="1.5"/>
+
+  <!-- ROW_CMP.EQ → AT_BOTTOM -->
+  <line x1="490" y1="90" x2="540" y2="90" stroke="#0f0" stroke-width="1.5"/>
+  <line x1="490" y1="90" x2="490" y2="175" stroke="#0f0" stroke-width="1.5"/>
+  <line x1="490" y1="175" x2="540" y2="175" stroke="#0f0" stroke-width="1.5" marker-end="url(#am3)"/>
+
+  <!-- TICK → CLK -->
+  <line x1="180" y1="185" x2="180" y2="195" stroke="#0ff" stroke-width="1.5"/>
+  <line x1="180" y1="195" x2="65" y2="195" stroke="#0ff" stroke-width="1.5"/>
+  <line x1="65" y1="195" x2="65" y2="120" stroke="#0ff" stroke-width="1.5"/>
+  <line x1="180" y1="195" x2="305" y2="195" stroke="#0ff" stroke-width="1.5"/>
+  <line x1="305" y1="195" x2="305" y2="120" stroke="#0ff" stroke-width="1.5"/>
+
+  <!-- Const15 → ROW_CMP -->
+  <line x1="480" y1="157" x2="480" y2="120" stroke="#fff" stroke-width="1.5"/>
+
+  <!-- 文字说明 -->
+  <text x="20" y="280" fill="#aaa" font-size="12">障碍物行更新: ROW_next = ROW + 1 (TICK驱动)</text>
+  <text x="20" y="305" fill="#aaa" font-size="12">抵达底部: ROW = 15 → AT_BOTTOM = 1 → 触发: 检测碰撞 + 计分 + 新障碍物(列从OBS_SRC载入)</text>
+  <text x="20" y="330" fill="#aaa" font-size="12">障碍物列更新: 每个TICK, OBS_COL从OBS_SRC载入最新列值</text>
+</svg>
+</div>
+</div>
+
+<!-- ============ PANEL 4: 碰撞 & FSM ============ -->
+<div class="panel" id="panel4">
+<h2>模块5: 碰撞检测 + 模块6: 游戏状态机</h2>
+<div class="svg-wrap">
+<svg viewBox="0 0 800 520" width="800" height="520" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="am4" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#f66"/></marker>
+    <marker id="ag4" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#0f0"/></marker>
+  </defs>
+
+  <!-- === 碰撞检测 (上) === -->
+  <text x="20" y="25" fill="#ff0" font-size="15" font-weight="bold">▎模块5: 碰撞检测</text>
+
+  <!-- COL_CMP -->
+  <rect x="20" y="40" width="110" height="55" rx="6" fill="#5c3a1a" stroke="#ff0" stroke-width="1.5"/>
+  <text x="75" y="60" text-anchor="middle" fill="#fff" font-size="12">COL_CMP</text>
+  <text x="75" y="78" text-anchor="middle" fill="#aaa" font-size="10">(620,250) 4bit</text>
+
+  <!-- HIT_AND -->
+  <rect x="200" y="45" width="70" height="45" rx="4" fill="#3a3a1a" stroke="#ff0" stroke-width="1.5"/>
+  <text x="235" y="62" text-anchor="middle" fill="#fff" font-size="11">HIT_AND</text>
+  <text x="235" y="78" text-anchor="middle" fill="#aaa" font-size="9">(720,300)</text>
+
+  <!-- HIT 输出 -->
+  <rect x="330" y="45" width="65" height="45" rx="4" fill="#5c1a1a" stroke="#f66" stroke-width="2"/>
+  <text x="362" y="62" text-anchor="middle" fill="#f66" font-size="12">HIT</text>
+  <text x="362" y="78" text-anchor="middle" fill="#aaa" font-size="9">(820,300)</text>
+
+  <!-- 输入标注 -->
+  <text x="20" y="120" fill="#f0f" font-size="11">CAR_COL → COL_CMP.A</text>
+  <text x="20" y="140" fill="#f0f" font-size="11">OBS_COL → COL_CMP.B</text>
+  <text x="20" y="160" fill="#0f0" font-size="11">AT_BOTTOM → HIT_AND.in2</text>
+
+  <!-- 连线 -->
+  <line x1="130" y1="67" x2="200" y2="67" stroke="#0f0" stroke-width="1.5" marker-end="url(#ag4)"/>
+  <text x="150" y="58" fill="#aaa" font-size="9">EQ=1</text>
+  <line x1="270" y1="67" x2="330" y2="67" stroke="#f66" stroke-width="2" marker-end="url(#am4)"/>
+  <text x="290" y="58" fill="#aaa" font-size="9">HIT=1!</text>
+
+  <!-- === FSM (下) === -->
+  <text x="20" y="210" fill="#ff0" font-size="15" font-weight="bold">▎模块6: 游戏状态机 (FSM)</text>
+
+  <!-- 状态寄存器 -->
+  <rect x="180" y="230" width="70" height="70" rx="6" fill="#1a3a5c" stroke="#0ff" stroke-width="2"/>
+  <text x="215" y="255" text-anchor="middle" fill="#fff" font-size="12">FF_S1</text>
+  <text x="215" y="275" text-anchor="middle" fill="#aaa" font-size="10">D-FF(700,60)</text>
+  <text x="215" y="290" text-anchor="middle" fill="#aaa" font-size="9">状态位1</text>
+
+  <rect x="180" y="330" width="70" height="70" rx="6" fill="#1a3a5c" stroke="#0ff" stroke-width="2"/>
+  <text x="215" y="355" text-anchor="middle" fill="#fff" font-size="12">FF_S0</text>
+  <text x="215" y="375" text-anchor="middle" fill="#aaa" font-size="10">D-FF(700,160)</text>
+  <text x="215" y="390" text-anchor="middle" fill="#aaa" font-size="9">状态位0</text>
+
+  <!-- 下一状态逻辑 -->
+  <rect x="320" y="240" width="110" height="50" rx="6" fill="#3a3a1a" stroke="#ff0" stroke-width="1"/>
+  <text x="375" y="262" text-anchor="middle" fill="#fff" font-size="11">下一状态逻辑</text>
+  <text x="375" y="280" text-anchor="middle" fill="#aaa" font-size="9">AND_START(620,400)</text>
+
+  <rect x="320" y="340" width="110" height="50" rx="6" fill="#3a3a1a" stroke="#ff0" stroke-width="1"/>
+  <text x="375" y="362" text-anchor="middle" fill="#fff" font-size="11">下一状态逻辑</text>
+  <text x="375" y="380" text-anchor="middle" fill="#aaa" font-size="9">AND_KEEP(700,400)</text>
+
+  <!-- OR门 -->
+  <rect x="465" y="315" width="55" height="50" rx="4" fill="#3a3a1a" stroke="#ff0" stroke-width="1.5"/>
+  <text x="492" y="335" text-anchor="middle" fill="#fff" font-size="11">OR_S0</text>
+  <text x="492" y="352" text-anchor="middle" fill="#aaa" font-size="9">(660,480)</text>
+
+  <!-- 状态输出 -->
+  <rect x="580" y="230" width="65" height="40" rx="4" fill="#1a5c3a" stroke="#0f0" stroke-width="1.5"/>
+  <text x="612" y="247" text-anchor="middle" fill="#fff" font-size="11">S1</text>
+  <text x="612" y="262" text-anchor="middle" fill="#aaa" font-size="9">(880,60)</text>
+
+  <rect x="580" y="290" width="65" height="40" rx="4" fill="#1a5c3a" stroke="#0f0" stroke-width="1.5"/>
+  <text x="612" y="307" text-anchor="middle" fill="#fff" font-size="11">S0</text>
+  <text x="612" y="322" text-anchor="middle" fill="#aaa" font-size="9">(880,160)</text>
+
+  <!-- LED -->
+  <rect x="680" y="225" width="50" height="30" rx="4" fill="#1a5c1a" stroke="#0f0" stroke-width="2"/>
+  <text x="705" y="245" text-anchor="middle" fill="#0f0" font-size="10">绿灯</text>
+
+  <rect x="680" y="275" width="50" height="30" rx="4" fill="#5c1a1a" stroke="#f66" stroke-width="2"/>
+  <text x="705" y="295" text-anchor="middle" fill="#f66" font-size="10">红灯</text>
+
+  <rect x="680" y="325" width="50" height="30" rx="4" fill="#5c3a1a" stroke="#ff0" stroke-width="1.5"/>
+  <text x="705" y="345" text-anchor="middle" fill="#ff0" font-size="10">蜂鸣</text>
+
+  <!-- 连线 -->
+  <line x1="250" y1="265" x2="320" y2="265" stroke="#f0f" stroke-width="1.5"/>
+  <line x1="250" y1="365" x2="320" y2="365" stroke="#f0f" stroke-width="1.5"/>
+
+  <line x1="430" y1="265" x2="465" y2="340" stroke="#ff0" stroke-width="1.5"/>
+  <line x1="430" y1="365" x2="465" y2="340" stroke="#ff0" stroke-width="1.5"/>
+
+  <line x1="520" y1="340" x2="580" y2="340" stroke="#0f0" stroke-width="2"/>
+  <line x1="520" y1="340" x2="250" y2="395" stroke="#0f0" stroke-width="2" marker-end="url(#ag4)"/>
+  <text x="380" y="410" fill="#0f0" font-size="10">S0_next → FF_S0.D</text>
+
+  <!-- S1 → 输出 -->
+  <line x1="250" y1="250" x2="580" y2="250" stroke="#f0f" stroke-width="1.5"/>
+  <line x1="250" y1="350" x2="580" y2="310" stroke="#f0f" stroke-width="1.5"/>
+
+  <!-- 状态 → LED -->
+  <line x1="645" y1="250" x2="680" y2="240" stroke="#0f0" stroke-width="1.5"/>
+  <line x1="645" y1="310" x2="680" y2="290" stroke="#f66" stroke-width="1.5"/>
+  <line x1="645" y1="310" x2="680" y2="340" stroke="#ff0" stroke-width="1.5"/>
+
+  <!-- HIT → FSM -->
+  <text x="20" y="460" fill="#f66" font-size="13" font-weight="bold">状态转移方程:</text>
+  <text x="20" y="485" fill="#aaa" font-size="12">  S1_next = HIT &amp; S0                          (碰撞时从 RUNNING → GAME_OVER)</text>
+  <text x="20" y="508" fill="#aaa" font-size="12">  S0_next = (!S1 &amp; !S0 &amp; START) | (!HIT &amp; S0)  (START开始 或 保持RUNNING)</text>
+</svg>
+</div>
+</div>
+
+<!-- ============ PANEL 5: 计分 & 显示 ============ -->
+<div class="panel" id="panel5">
+<h2>模块7: 计分器 + 模块8: LED矩阵显示控制</h2>
+<div class="svg-wrap">
+<svg viewBox="0 0 800 480" width="800" height="480" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="ag5" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#0f0"/></marker>
+  </defs>
+
+  <!-- === 计分器 (上半) === -->
+  <text x="20" y="25" fill="#0f0" font-size="15" font-weight="bold">▎模块7: BCD计分器 (0-99)</text>
+
+  <!-- AND_SCORE -->
+  <rect x="20" y="40" width="80" height="40" rx="4" fill="#3a3a1a" stroke="#ff0" stroke-width="1"/>
+  <text x="60" y="57" text-anchor="middle" fill="#fff" font-size="10">AND_SCORE</text>
+  <text x="60" y="72" text-anchor="middle" fill="#aaa" font-size="8">(620,720)</text>
+
+  <!-- SCORE1 -->
+  <rect x="150" y="35" width="90" height="55" rx="6" fill="#1a3a5c" stroke="#0ff" stroke-width="1.5"/>
+  <text x="195" y="55" text-anchor="middle" fill="#fff" font-size="11">SCORE1(个位)</text>
+  <text x="195" y="75" text-anchor="middle" fill="#aaa" font-size="9">Reg(700,560)</text>
+
+  <!-- SCORE10 -->
+  <rect x="300" y="35" width="90" height="55" rx="6" fill="#1a3a5c" stroke="#0ff" stroke-width="1.5"/>
+  <text x="345" y="55" text-anchor="middle" fill="#fff" font-size="11">SCORE10(十位)</text>
+  <text x="345" y="75" text-anchor="middle" fill="#aaa" font-size="9">Reg(700,640)</text>
+
+  <!-- CMP9 -->
+  <rect x="240" y="110" width="70" height="40" rx="4" fill="#5c3a1a" stroke="#ff0" stroke-width="1"/>
+  <text x="275" y="127" text-anchor="middle" fill="#fff" font-size="10">CMP9</text>
+  <text x="275" y="143" text-anchor="middle" fill="#aaa" font-size="8">(560,680)</text>
+
+  <!-- 7段数码管 -->
+  <rect x="450" y="35" width="70" height="55" rx="4" fill="#1a5c3a" stroke="#0f0" stroke-width="2"/>
+  <text x="485" y="58" text-anchor="middle" fill="#fff" font-size="11">DISP1</text>
+  <text x="485" y="78" text-anchor="middle" fill="#aaa" font-size="9">个位 (860,560)</text>
+
+  <rect x="550" y="35" width="70" height="55" rx="4" fill="#1a5c3a" stroke="#0f0" stroke-width="2"/>
+  <text x="585" y="58" text-anchor="middle" fill="#fff" font-size="11">DISP10</text>
+  <text x="585" y="78" text-anchor="middle" fill="#aaa" font-size="9">十位 (860,630)</text>
+
+  <!-- 连线 -->
+  <line x1="100" y1="60" x2="150" y2="60" stroke="#0f0" stroke-width="1.5"/>
+  <text x="120" y="50" fill="#aaa" font-size="8">得分触发</text>
+
+  <line x1="240" y1="60" x2="300" y2="60" stroke="#f0f" stroke-width="1.5"/>
+  <text x="265" y="50" fill="#aaa" font-size="8">进位 (CMP9.EQ)</text>
+
+  <!-- SCORE1 → DISP1 -->
+  <line x1="240" y1="55" x2="450" y2="55" stroke="#f0f" stroke-width="1.5"/>
+  <line x1="390" y1="55" x2="550" y2="55" stroke="#f0f" stroke-width="1.5"/>
+
+  <!-- CMP9 连线 -->
+  <line x1="195" y1="65" x2="240" y2="130" stroke="#f0f" stroke-width="1.5"/>
+  <line x1="275" y1="150" x2="300" y2="80" stroke="#0f0" stroke-width="1.5" marker-end="url(#ag5)"/>
+
+  <text x="20" y="185" fill="#aaa" font-size="11">得分条件: AT_BOTTOM=1 &amp; HIT=0 &amp; RUNNING → SCORE1.EN, 个位每TICK+1</text>
+  <text x="20" y="205" fill="#aaa" font-size="11">进位: SCORE1=9 时 → SCORE10.EN 使能, 下个TICK十位+1</text>
+
+  <!-- === 显示控制器 (下半) === -->
+  <text x="20" y="255" fill="#0f0" font-size="15" font-weight="bold">▎模块8: LED矩阵显示控制器</text>
+
+  <!-- SCAN_ROW -->
+  <rect x="20" y="270" width="90" height="55" rx="6" fill="#1a3a5c" stroke="#0ff" stroke-width="1.5"/>
+  <text x="65" y="290" text-anchor="middle" fill="#fff" font-size="12">SCAN_ROW</text>
+  <text x="65" y="310" text-anchor="middle" fill="#aaa" font-size="9">Reg(200,620)</text>
+
+  <!-- 比较器 -->
+  <rect x="160" y="270" width="75" height="45" rx="4" fill="#5c3a1a" stroke="#ff0" stroke-width="1"/>
+  <text x="197" y="290" text-anchor="middle" fill="#fff" font-size="10">CMP_14</text>
+  <text x="197" y="305" text-anchor="middle" fill="#aaa" font-size="8">scan==14?</text>
+
+  <rect x="160" y="330" width="75" height="45" rx="4" fill="#5c3a1a" stroke="#ff0" stroke-width="1"/>
+  <text x="197" y="350" text-anchor="middle" fill="#fff" font-size="10">CMP_15</text>
+  <text x="197" y="365" text-anchor="middle" fill="#aaa" font-size="8">scan==15?</text>
+
+  <rect x="160" y="390" width="75" height="45" rx="4" fill="#5c3a1a" stroke="#ff0" stroke-width="1"/>
+  <text x="197" y="410" text-anchor="middle" fill="#fff" font-size="10">CMP_OBS</text>
+  <text x="197" y="425" text-anchor="middle" fill="#aaa" font-size="8">scan==obs?</text>
+
+  <!-- Decoders -->
+  <rect x="300" y="280" width="70" height="50" rx="4" fill="#5c3a1a" stroke="#ff0" stroke-width="1.5"/>
+  <text x="335" y="300" text-anchor="middle" fill="#fff" font-size="10">DEC_CAR</text>
+  <text x="335" y="318" text-anchor="middle" fill="#aaa" font-size="8">(560,620)</text>
+
+  <rect x="300" y="360" width="70" height="50" rx="4" fill="#5c3a1a" stroke="#ff0" stroke-width="1.5"/>
+  <text x="335" y="380" text-anchor="middle" fill="#fff" font-size="10">DEC_OBS</text>
+  <text x="335" y="398" text-anchor="middle" fill="#aaa" font-size="8">(560,700)</text>
+
+  <!-- LED Matrix -->
+  <rect x="450" y="280" width="100" height="100" rx="8" fill="#1a3a5c" stroke="#0f0" stroke-width="2"/>
+  <text x="500" y="310" text-anchor="middle" fill="#0f0" font-size="12">LED Matrix</text>
+  <text x="500" y="330" text-anchor="middle" fill="#aaa" font-size="10">16×16</text>
+  <text x="500" y="350" text-anchor="middle" fill="#aaa" font-size="9">(900,640)</text>
+
+  <!-- 矩阵内示意 -->
+  <rect x="470" y="300" width="60" height="60" fill="none" stroke="#333" stroke-width="0.5"/>
+  <rect x="494" y="340" width="8" height="4" fill="#0f0" opacity="0.8"/>
+  <rect x="480" y="300" width="8" height="4" fill="#f66" opacity="0.6"/>
+
+  <!-- 连线 -->
+  <line x1="110" y1="295" x2="160" y2="292" stroke="#f0f" stroke-width="1.5"/>
+  <line x1="110" y1="295" x2="160" y2="352" stroke="#f0f" stroke-width="1.5"/>
+  <line x1="110" y1="295" x2="160" y2="412" stroke="#f0f" stroke-width="1.5"/>
+
+  <!-- SCAN_ROW.Q → Matrix Row -->
+  <line x1="65" y1="295" x2="65" y2="450" stroke="#0ff" stroke-width="1.5"/>
+  <line x1="65" y1="450" x2="500" y2="450" stroke="#0ff" stroke-width="1.5"/>
+  <line x1="500" y1="450" x2="500" y2="380" stroke="#0ff" stroke-width="1.5"/>
+
+  <!-- CAR_COL, OBS_COL → Decoders -->
+  <line x1="370" y1="305" x2="450" y2="305" stroke="#f0f" stroke-width="1.5"/>
+  <line x1="370" y1="385" x2="450" y2="385" stroke="#f0f" stroke-width="1.5"/>
+
+  <!-- Decoder → Matrix Col -->
+  <line x1="450" y1="310" x2="450" y2="310" stroke="#f0f" stroke-width="1.5"/>
+
+  <text x="20" y="470" fill="#aaa" font-size="11">行扫描: SCAN_ROW 0→15 循环(系统时钟), 每行输出对应列数据(CAR或OBS或空)</text>
+</svg>
+</div>
+</div>
+
+<!-- ============ PANEL 6: 输出设备 ============ -->
+<div class="panel" id="panel6">
+<h2>模块9: 输出设备 &amp; 复位总线</h2>
+<div class="svg-wrap">
+<svg viewBox="0 0 800 380" width="800" height="380" xmlns="http://www.w3.org/2000/svg">
+  <!-- 输出设备 -->
+  <text x="20" y="25" fill="#f66" font-size="15" font-weight="bold">▎输出设备连接</text>
+
+  <!-- LED RUN -->
+  <rect x="20" y="50" width="70" height="60" rx="6" fill="#1a5c1a" stroke="#0f0" stroke-width="2"/>
+  <text x="55" y="75" text-anchor="middle" fill="#0f0" font-size="12">LED</text>
+  <text x="55" y="93" text-anchor="middle" fill="#fff" font-size="10">RUN</text>
+  <text x="55" y="105" text-anchor="middle" fill="#aaa" font-size="8">(980,250)</text>
+
+  <!-- LED GAMEOVER -->
+  <rect x="130" y="50" width="90" height="60" rx="6" fill="#5c1a1a" stroke="#f66" stroke-width="2"/>
+  <text x="175" y="75" text-anchor="middle" fill="#f66" font-size="12">LED</text>
+  <text x="175" y="93" text-anchor="middle" fill="#fff" font-size="10">GAMEOVER</text>
+  <text x="175" y="105" text-anchor="middle" fill="#aaa" font-size="8">(980,320)</text>
+
+  <!-- Buzzer -->
+  <rect x="270" y="50" width="90" height="60" rx="6" fill="#5c3a1a" stroke="#ff0" stroke-width="2"/>
+  <text x="315" y="75" text-anchor="middle" fill="#ff0" font-size="12">Buzzer</text>
+  <text x="315" y="93" text-anchor="middle" fill="#fff" font-size="10">蜂鸣器</text>
+  <text x="315" y="105" text-anchor="middle" fill="#aaa" font-size="8">(980,400)</text>
+
+  <!-- 7-Seg Displays -->
+  <rect x="420" y="40" width="80" height="60" rx="6" fill="#1a3a5c" stroke="#0f0" stroke-width="1.5"/>
+  <text x="460" y="65" text-anchor="middle" fill="#fff" font-size="11">DISP1</text>
+  <text x="460" y="83" text-anchor="middle" fill="#aaa" font-size="9">个位 (860,560)</text>
+
+  <rect x="530" y="40" width="80" height="60" rx="6" fill="#1a3a5c" stroke="#0f0" stroke-width="1.5"/>
+  <text x="570" y="65" text-anchor="middle" fill="#fff" font-size="11">DISP10</text>
+  <text x="570" y="83" text-anchor="middle" fill="#aaa" font-size="9">十位 (860,630)</text>
+
+  <!-- LED Matrix -->
+  <rect x="660" y="30" width="110" height="90" rx="8" fill="#1a3a5c" stroke="#0f0" stroke-width="2"/>
+  <text x="715" y="60" text-anchor="middle" fill="#0f0" font-size="12">LED Matrix</text>
+  <text x="715" y="80" text-anchor="middle" fill="#aaa" font-size="10">16×16</text>
+  <text x="715" y="100" text-anchor="middle" fill="#aaa" font-size="9">(900,640)</text>
+
+  <!-- 信号来源标注 -->
+  <line x1="55" y1="40" x2="55" y2="20" stroke="#0f0" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="10" y="15" fill="#0f0" font-size="9">来自 AND_RUN</text>
+
+  <line x1="175" y1="40" x2="175" y2="20" stroke="#f66" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="140" y="15" fill="#f66" font-size="9">来自 AND_GO</text>
+
+  <line x1="315" y1="40" x2="315" y2="20" stroke="#ff0" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="280" y="15" fill="#ff0" font-size="9">来自 GAMEOVER</text>
+
+  <!-- 复位总线 -->
+  <text x="20" y="170" fill="#f66" font-size="15" font-weight="bold">▎全局复位总线 (RST → 所有寄存器 CLR)</text>
+  <text x="20" y="200" fill="#fff" font-size="13">RST 按钮 (80,330) 通过主总线连接到以下寄存器的 CLR 引脚:</text>
+
+  <table-like group>
+  <rect x="20" y="215" width="760" height="30" rx="0" fill="#0f3460"/>
+  <text x="30" y="235" fill="#fff" font-size="12">CNT1(200,30) | CNT2(330,30) | CNT3(460,30) | OBS_SRC(200,140) | CAR_POS(200,250) | OBS_COL(200,480)</text>
+  <rect x="20" y="247" width="760" height="30" rx="0" fill="#0f3460"/>
+  <text x="30" y="267" fill="#fff" font-size="12">OBS_ROW(400,480) | SCAN_ROW(200,620) | FF_S1(700,60) | FF_S0(700,160) | SCORE1(700,560) | SCORE10(700,640)</text>
+
+  <!-- 总线示意图 -->
+  <rect x="20" y="295" width="30" height="60" rx="4" fill="#5c1a1a" stroke="#f66" stroke-width="2"/>
+  <text x="35" y="330" text-anchor="middle" fill="#fff" font-size="10">RST</text>
+
+  <line x1="50" y1="325" x2="780" y2="325" stroke="#f66" stroke-width="3"/>
+  <text x="730" y="320" fill="#f66" font-size="11">RST_BUS →</text>
+
+  <!-- 分支示意 -->
+  <line x1="150" y1="325" x2="150" y2="355" stroke="#f66" stroke-width="1.5" marker-end="url(#am4)"/>
+  <text x="120" y="375" fill="#aaa" font-size="9">CNT1.CLR</text>
+
+  <line x1="250" y1="325" x2="250" y2="355" stroke="#f66" stroke-width="1.5"/>
+  <text x="220" y="375" fill="#aaa" font-size="9">CNT2.CLR</text>
+
+  <line x1="350" y1="325" x2="350" y2="355" stroke="#f66" stroke-width="1.5"/>
+  <text x="320" y="375" fill="#aaa" font-size="9">CNT3.CLR</text>
+
+  <line x1="450" y1="325" x2="450" y2="355" stroke="#f66" stroke-width="1.5"/>
+  <text x="410" y="375" fill="#aaa" font-size="9">OBS_SRC.CLR</text>
+
+  <line x1="550" y1="325" x2="550" y2="355" stroke="#f66" stroke-width="1.5"/>
+  <text x="510" y="375" fill="#aaa" font-size="9">CAR_POS.CLR</text>
+
+  <line x1="650" y1="325" x2="650" y2="355" stroke="#f66" stroke-width="1.5"/>
+  <text x="600" y="375" fill="#aaa" font-size="9">FSM/Score.CLR</text>
+</svg>
+</div>
+</div>
+
+<!-- ============ PANEL 7: 元件坐标总表 ============ -->
+<div class="panel" id="panel7">
+<h2>元件坐标总表</h2>
+<div class="info-box">
+  <strong>说明:</strong> 以下为所有86个元件在Logisim中的放置坐标(loc)及关键参数。<br>
+  引脚位置 = 元件坐标 + 类型偏移量 (见连线步骤文档第二章)。
+</div>
+
+<table>
+<tr><th>区</th><th>元件</th><th>库</th><th>坐标</th><th>位宽</th><th>参数</th></tr>
+<tr><td rowspan="9">1.输入</td><td>CLK</td><td>0</td><td>(80,40)</td><td>-</td><td>Clock, 标签:CLK</td></tr>
+<tr><td>LEFT</td><td>5</td><td>(80,120)</td><td>-</td><td>Button, 标签:LEFT</td></tr>
+<tr><td>RIGHT</td><td>5</td><td>(80,190)</td><td>-</td><td>Button, 标签:RIGHT</td></tr>
+<tr><td>START</td><td>5</td><td>(80,260)</td><td>-</td><td>Button, 标签:START</td></tr>
+<tr><td>RST</td><td>5</td><td>(80,330)</td><td>-</td><td>Button, 标签:RST</td></tr>
+<tr><td>SPEED0</td><td>0</td><td>(80,420)</td><td>1</td><td>Pin 输入</td></tr>
+<tr><td>SPEED1</td><td>0</td><td>(80,450)</td><td>1</td><td>Pin 输入</td></tr>
+<tr><td>EN_CONST</td><td>0</td><td>(110,40)</td><td>1</td><td>Constant 0x1</td></tr>
+<tr><td>CNT_CONST</td><td>0</td><td>(70,40)</td><td>4</td><td>Constant 0x1</td></tr>
+
+<tr><td rowspan="8">2.分频</td><td>CNT1</td><td>4</td><td>(200,30)</td><td>4</td><td>Register</td></tr>
+<tr><td>ADD1</td><td>3</td><td>(130,30)</td><td>4</td><td>Adder</td></tr>
+<tr><td>CNT2</td><td>4</td><td>(330,30)</td><td>4</td><td>Register</td></tr>
+<tr><td>ADD2</td><td>3</td><td>(260,30)</td><td>4</td><td>Adder</td></tr>
+<tr><td>CNT3</td><td>4</td><td>(460,30)</td><td>4</td><td>Register</td></tr>
+<tr><td>ADD3</td><td>3</td><td>(390,30)</td><td>4</td><td>Adder</td></tr>
+<tr><td>SPD_MUX</td><td>2</td><td>(560,60)</td><td>1</td><td>MUX, sel=2</td></tr>
+<tr><td>TICK_PIN</td><td>0</td><td>(630,85)</td><td>1</td><td>Pin 输出</td></tr>
+
+<tr><td rowspan="4">3.列源</td><td>OBS_SRC</td><td>4</td><td>(200,140)</td><td>4</td><td>Register</td></tr>
+<tr><td>OBS_ADD</td><td>3</td><td>(130,140)</td><td>4</td><td>Adder</td></tr>
+<tr><td>STEP3</td><td>0</td><td>(70,160)</td><td>4</td><td>Constant 0x3</td></tr>
+<tr><td>SRC_PIN</td><td>0</td><td>(350,150)</td><td>4</td><td>Pin 输出</td></tr>
+
+<tr><td rowspan="13">4.小车</td><td>CAR_POS</td><td>4</td><td>(200,250)</td><td>4</td><td>Register</td></tr>
+<tr><td>CAR_ADD</td><td>3</td><td>(130,250)</td><td>4</td><td>Adder</td></tr>
+<tr><td>MV_MUX</td><td>2</td><td>(200,320)</td><td>4</td><td>MUX, sel=2</td></tr>
+<tr><td>CONST_1</td><td>0</td><td>(60,310)</td><td>4</td><td>Constant 0x1</td></tr>
+<tr><td>CONST_M1</td><td>0</td><td>(60,340)</td><td>4</td><td>Constant 0xf</td></tr>
+<tr><td>CONST_0</td><td>0</td><td>(60,370)</td><td>4</td><td>Constant 0x0</td></tr>
+<tr><td>CMP_LO</td><td>3</td><td>(360,230)</td><td>4</td><td>Comparator</td></tr>
+<tr><td>CMP_HI</td><td>3</td><td>(360,280)</td><td>4</td><td>Comparator</td></tr>
+<tr><td>CMP_LO_C</td><td>0</td><td>(310,230)</td><td>4</td><td>Constant 0x0</td></tr>
+<tr><td>CMP_HI_C</td><td>0</td><td>(310,280)</td><td>4</td><td>Constant 0xf</td></tr>
+<tr><td>AND_L</td><td>1</td><td>(450,230)</td><td>1</td><td>AND Gate</td></tr>
+<tr><td>AND_R</td><td>1</td><td>(450,280)</td><td>1</td><td>AND Gate</td></tr>
+<tr><td>CAR_PIN</td><td>0</td><td>(530,250)</td><td>4</td><td>Pin 输出</td></tr>
+
+<tr><td rowspan="9">5.障碍</td><td>OBS_COL</td><td>4</td><td>(200,480)</td><td>4</td><td>Register</td></tr>
+<tr><td>OBS_ROW</td><td>4</td><td>(400,480)</td><td>4</td><td>Register</td></tr>
+<tr><td>ROW_ADD</td><td>3</td><td>(330,480)</td><td>4</td><td>Adder</td></tr>
+<tr><td>ROW_CONST</td><td>0</td><td>(280,510)</td><td>4</td><td>Constant 0x1</td></tr>
+<tr><td>ROW_CMP</td><td>3</td><td>(400,560)</td><td>4</td><td>Comparator</td></tr>
+<tr><td>CONST_15</td><td>0</td><td>(350,590)</td><td>4</td><td>Constant 0xf</td></tr>
+<tr><td>COL_PIN</td><td>0</td><td>(530,480)</td><td>4</td><td>Pin 输出</td></tr>
+<tr><td>ROW_PIN</td><td>0</td><td>(530,520)</td><td>4</td><td>Pin 输出</td></tr>
+<tr><td>BOT_PIN</td><td>0</td><td>(530,580)</td><td>1</td><td>Pin 输出</td></tr>
+
+<tr><td rowspan="3">6.碰撞</td><td>COL_CMP</td><td>3</td><td>(620,250)</td><td>4</td><td>Comparator</td></tr>
+<tr><td>HIT_AND</td><td>1</td><td>(720,300)</td><td>1</td><td>AND Gate</td></tr>
+<tr><td>HIT_PIN</td><td>0</td><td>(820,300)</td><td>1</td><td>Pin 输出</td></tr>
+
+<tr><td rowspan="14">7.FSM</td><td>FF_S1</td><td>4</td><td>(700,60)</td><td>-</td><td>D Flip-Flop</td></tr>
+<tr><td>FF_S0</td><td>4</td><td>(700,160)</td><td>-</td><td>D Flip-Flop</td></tr>
+<tr><td>NOT_S1</td><td>1</td><td>(580,400)</td><td>-</td><td>NOT Gate</td></tr>
+<tr><td>NOT_S0</td><td>1</td><td>(580,440)</td><td>-</td><td>NOT Gate</td></tr>
+<tr><td>NOT_HIT</td><td>1</td><td>(780,350)</td><td>-</td><td>NOT Gate</td></tr>
+<tr><td>AND_START</td><td>1</td><td>(620,400)</td><td>-</td><td>AND Gate</td></tr>
+<tr><td>AND_KEEP</td><td>1</td><td>(700,400)</td><td>-</td><td>AND Gate</td></tr>
+<tr><td>OR_S0</td><td>1</td><td>(660,480)</td><td>-</td><td>OR Gate</td></tr>
+<tr><td>AND_S1</td><td>1</td><td>(780,480)</td><td>-</td><td>AND Gate</td></tr>
+<tr><td>NOT_RUN</td><td>1</td><td>(840,250)</td><td>-</td><td>NOT Gate</td></tr>
+<tr><td>AND_RUN</td><td>1</td><td>(880,250)</td><td>-</td><td>AND Gate</td></tr>
+<tr><td>NOT_GO</td><td>1</td><td>(840,320)</td><td>-</td><td>NOT Gate</td></tr>
+<tr><td>AND_GO</td><td>1</td><td>(880,320)</td><td>-</td><td>AND Gate</td></tr>
+<tr><td>S1_PIN/S0_PIN</td><td>0</td><td>(880,60/160)</td><td>1</td><td>Pin 输出</td></tr>
+
+<tr><td rowspan="8">8.计分</td><td>SCORE1</td><td>4</td><td>(700,560)</td><td>4</td><td>Register</td></tr>
+<tr><td>SC1_ADD</td><td>3</td><td>(620,560)</td><td>4</td><td>Adder</td></tr>
+<tr><td>SCORE10</td><td>4</td><td>(700,640)</td><td>4</td><td>Register</td></tr>
+<tr><td>SC10_ADD</td><td>3</td><td>(620,640)</td><td>4</td><td>Adder</td></tr>
+<tr><td>CMP9</td><td>3</td><td>(560,680)</td><td>4</td><td>Comparator</td></tr>
+<tr><td>CONST9</td><td>0</td><td>(510,680)</td><td>4</td><td>Constant 0x9</td></tr>
+<tr><td>AND_SCORE</td><td>1</td><td>(620,720)</td><td>1</td><td>AND Gate</td></tr>
+<tr><td>NOT_HIT2</td><td>1</td><td>(560,720)</td><td>-</td><td>NOT Gate</td></tr>
+
+<tr><td rowspan="10">9.显示</td><td>SCAN_ROW</td><td>4</td><td>(200,620)</td><td>4</td><td>Register</td></tr>
+<tr><td>SCAN_ADD</td><td>3</td><td>(130,620)</td><td>4</td><td>Adder</td></tr>
+<tr><td>CMP_14</td><td>3</td><td>(400,620)</td><td>4</td><td>Comparator</td></tr>
+<tr><td>CMP_15</td><td>3</td><td>(400,670)</td><td>4</td><td>Comparator</td></tr>
+<tr><td>CMP_OBS</td><td>3</td><td>(400,720)</td><td>4</td><td>Comparator</td></tr>
+<tr><td>CST14</td><td>0</td><td>(340,630)</td><td>4</td><td>Constant 0xe</td></tr>
+<tr><td>CST15</td><td>0</td><td>(340,680)</td><td>4</td><td>Constant 0xf</td></tr>
+<tr><td>DEC_CAR</td><td>2</td><td>(560,620)</td><td>4</td><td>Decoder 4→16</td></tr>
+<tr><td>DEC_OBS</td><td>2</td><td>(560,700)</td><td>4</td><td>Decoder 4→16</td></tr>
+<tr><td>MATRIX</td><td>5</td><td>(900,640)</td><td>-</td><td>LED Matrix 16x16</td></tr>
+
+<tr><td rowspan="5">10.输出</td><td>LED_RUN</td><td>5</td><td>(980,250)</td><td>-</td><td>LED, 绿色</td></tr>
+<tr><td>LED_GO</td><td>5</td><td>(980,320)</td><td>-</td><td>LED, 红色</td></tr>
+<tr><td>BUZZ</td><td>10</td><td>(980,400)</td><td>-</td><td>Buzzer</td></tr>
+<tr><td>DISP1</td><td>5</td><td>(860,560)</td><td>-</td><td>7-Segment Display</td></tr>
+<tr><td>DISP10</td><td>5</td><td>(860,630)</td><td>-</td><td>7-Segment Display</td></tr>
+</table>
+</div>
+
+<script>
+function switchTab(i) {
+  document.querySelectorAll('.tab').forEach((t, idx) => t.classList.toggle('active', idx === i));
+  document.querySelectorAll('.panel').forEach((p, idx) => p.classList.toggle('active', idx === i));
+}
+</script>
+</body>
+</html>
