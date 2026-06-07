@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数字逻辑课程设计 — 模块关系图（Visio风格）</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Microsoft YaHei", "微软雅黑", sans-serif;
+    background: #e8ecf1;
+    padding: 20px;
+  }
+  .page {
+    background: #fff;
+    width: 1100px;
+    margin: 0 auto 30px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+    padding: 24px 20px 20px;
+    page-break-after: always;
+  }
+  .page-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #1a1a1a;
+    border-bottom: 2px solid #2b579a;
+    padding-bottom: 6px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .page-title .num {
+    background: #2b579a;
+    color: #fff;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+  svg { display: block; margin: 0 auto; }
+
+  /* ===== 打印适配 ===== */
+  @media print {
+    body { background: #fff; padding: 0; }
+    .page { box-shadow: none; margin: 0; page-break-after: always; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== 图1: 层次模块关系图 ==================== -->
+<div class="page">
+  <div class="page-title"><span class="num">1</span> 系统层次模块关系图</div>
+  <svg viewBox="0 0 1050 520" xmlns="http://www.w3.org/2000/svg">
+
+    <defs>
+      <filter id="shadow" x="-4%" y="-4%" width="110%" height="116%">
+        <feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity="0.15"/>
+      </filter>
+      <marker id="arrowBlue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#2b579a"/>
+      </marker>
+      <linearGradient id="gradTop" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#e3f2fd"/>
+        <stop offset="100%" stop-color="#bbdefb"/>
+      </linearGradient>
+      <linearGradient id="gradGame" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#fff8e1"/>
+        <stop offset="100%" stop-color="#ffecb3"/>
+      </linearGradient>
+      <linearGradient id="gradMod" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#f5f5f5"/>
+        <stop offset="100%" stop-color="#e8e8e8"/>
+      </linearGradient>
+      <linearGradient id="gradM1" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#e3f2fd"/><stop offset="100%" stop-color="#90caf9"/>
+      </linearGradient>
+      <linearGradient id="gradM2" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#e8f5e9"/><stop offset="100%" stop-color="#a5d6a7"/>
+      </linearGradient>
+      <linearGradient id="gradM3" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#fffde7"/><stop offset="100%" stop-color="#fff59d"/>
+      </linearGradient>
+      <linearGradient id="gradM4" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#e8f5e9"/><stop offset="100%" stop-color="#81c784"/>
+      </linearGradient>
+      <linearGradient id="gradM5" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#fbe9e7"/><stop offset="100%" stop-color="#ffab91"/>
+      </linearGradient>
+      <linearGradient id="gradM6" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#f3e5f5"/><stop offset="100%" stop-color="#ce93d8"/>
+      </linearGradient>
+      <linearGradient id="gradM7" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#e0f2f1"/><stop offset="100%" stop-color="#80cbc4"/>
+      </linearGradient>
+      <linearGradient id="gradM8" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#fff3e0"/><stop offset="100%" stop-color="#ffcc80"/>
+      </linearGradient>
+      <linearGradient id="gradGS" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ede7f6"/><stop offset="100%" stop-color="#b39ddb"/>
+      </linearGradient>
+    </defs>
+
+    <!-- 背景网格 (Visio风格) -->
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e0e0" stroke-width="0.3"/>
+    </pattern>
+    <rect width="1050" height="520" fill="url(#grid)" opacity="0.4"/>
+
+    <!-- ===== 顶部大框: main ===== -->
+    <rect x="20" y="15" width="1010" height="490" rx="10" fill="none" stroke="#2b579a" stroke-width="3" stroke-dasharray="10,4"/>
+    <rect x="850" y="18" width="170" height="26" rx="6" fill="#2b579a"/>
+    <text x="935" y="36" text-anchor="middle" fill="#fff" font-size="13" font-weight="bold">main（顶层系统）</text>
+
+    <!-- model1 时钟分频 -->
+    <rect x="50" y="55" width="180" height="80" rx="8" fill="url(#gradM1)" stroke="#1565c0" stroke-width="2" filter="url(#shadow)"/>
+    <text x="140" y="82" text-anchor="middle" fill="#0d47a1" font-size="15" font-weight="bold">model1</text>
+    <text x="140" y="104" text-anchor="middle" fill="#1565c0" font-size="12">时钟分频计</text>
+    <text x="140" y="124" text-anchor="middle" fill="#546e7a" font-size="10">Clock Divider</text>
+
+    <!-- GameState -->
+    <rect x="780" y="55" width="200" height="80" rx="8" fill="url(#gradGS)" stroke="#7b1fa2" stroke-width="2" filter="url(#shadow)"/>
+    <text x="880" y="82" text-anchor="middle" fill="#4a148c" font-size="15" font-weight="bold">GameState</text>
+    <text x="880" y="104" text-anchor="middle" fill="#7b1fa2" font-size="12">游戏状态显示</text>
+    <text x="880" y="124" text-anchor="middle" fill="#546e7a" font-size="10">Status Display</text>
+
+    <!-- ===== 中部大框: TEST ===== -->
+    <rect x="50" y="165" width="930" height="320" rx="10" fill="none" stroke="#e65100" stroke-width="2.5" stroke-dasharray="8,3"/>
+    <rect x="780" y="168" width="190" height="26" rx="6" fill="#e65100"/>
+    <text x="875" y="186" text-anchor="middle" fill="#fff" font-size="13" font-weight="bold">TEST（游戏逻辑系统）</text>
+
+    <!-- model2 -->
+    <rect x="70" y="210" width="195" height="85" rx="7" fill="url(#gradM2)" stroke="#2e7d32" stroke-width="1.8" filter="url(#shadow)"/>
+    <text x="167" y="238" text-anchor="middle" fill="#1b5e20" font-size="14" font-weight="bold">model2</text>
+    <text x="167" y="260" text-anchor="middle" fill="#2e7d32" font-size="12">随机数生成器</text>
+    <text x="167" y="280" text-anchor="middle" fill="#546e7a" font-size="10">LFSR Random</text>
+
+    <!-- model4 -->
+    <rect x="70" y="315" width="195" height="85" rx="7" fill="url(#gradM4)" stroke="#2e7d32" stroke-width="1.8" filter="url(#shadow)"/>
+    <text x="167" y="343" text-anchor="middle" fill="#1b5e20" font-size="14" font-weight="bold">model4</text>
+    <text x="167" y="365" text-anchor="middle" fill="#2e7d32" font-size="12">障碍物管理</text>
+    <text x="167" y="385" text-anchor="middle" fill="#546e7a" font-size="10">Obstacle Manager</text>
+
+    <!-- model3 -->
+    <rect x="295" y="210" width="195" height="85" rx="7" fill="url(#gradM3)" stroke="#f9a825" stroke-width="1.8" filter="url(#shadow)"/>
+    <text x="392" y="238" text-anchor="middle" fill="#e65100" font-size="14" font-weight="bold">model3</text>
+    <text x="392" y="260" text-anchor="middle" fill="#f57f17" font-size="12">小车控制器</text>
+    <text x="392" y="280" text-anchor="middle" fill="#546e7a" font-size="10">Car Controller</text>
+
+    <!-- model5 -->
+    <rect x="295" y="315" width="195" height="85" rx="7" fill="url(#gradM5)" stroke="#bf360c" stroke-width="1.8" filter="url(#shadow)"/>
+    <text x="392" y="343" text-anchor="middle" fill="#bf360c" font-size="14" font-weight="bold">model5</text>
+    <text x="392" y="365" text-anchor="middle" fill="#d84315" font-size="12">碰撞检测</text>
+    <text x="392" y="385" text-anchor="middle" fill="#546e7a" font-size="10">Collision Detect</text>
+
+    <!-- model6 (核心，放中间) -->
+    <rect x="520" y="250" width="195" height="95" rx="7" fill="url(#gradM6)" stroke="#6a1b9a" stroke-width="2.2" filter="url(#shadow)"/>
+    <text x="617" y="278" text-anchor="middle" fill="#4a148c" font-size="14" font-weight="bold">model6 ⭐</text>
+    <text x="617" y="300" text-anchor="middle" fill="#6a1b9a" font-size="12">游戏状态机 (FSM)</text>
+    <text x="617" y="322" text-anchor="middle" fill="#546e7a" font-size="10">Game FSM</text>
+
+    <!-- model7 -->
+    <rect x="745" y="225" width="195" height="85" rx="7" fill="url(#gradM7)" stroke="#00695c" stroke-width="1.8" filter="url(#shadow)"/>
+    <text x="842" y="253" text-anchor="middle" fill="#004d40" font-size="14" font-weight="bold">model7</text>
+    <text x="842" y="275" text-anchor="middle" fill="#00695c" font-size="12">游戏计分器</text>
+    <text x="842" y="295" text-anchor="middle" fill="#546e7a" font-size="10">Score Counter</text>
+
+    <!-- model8 -->
+    <rect x="745" y="330" width="195" height="85" rx="7" fill="url(#gradM8)" stroke="#e65100" stroke-width="1.8" filter="url(#shadow)"/>
+    <text x="842" y="358" text-anchor="middle" fill="#bf360c" font-size="14" font-weight="bold">model8</text>
+    <text x="842" y="380" text-anchor="middle" fill="#e65100" font-size="12">LED矩阵输出源</text>
+    <text x="842" y="400" text-anchor="middle" fill="#546e7a" font-size="10">LED Matrix Driver</text>
+
+    <!-- ===== 连线 ===== -->
+
+    <!-- model1 → TEST (时钟) -->
+    <path d="M140,135 L140,200" stroke="#1565c0" stroke-width="2.5" fill="none" marker-end="url(#arrowBlue)" stroke-dasharray="6,2"/>
+    <rect x="147" y="155" width="70" height="16" rx="4" fill="#1565c0" opacity="0.85"/>
+    <text x="182" y="167" text-anchor="middle" fill="#fff" font-size="9">时钟信号</text>
+
+    <!-- model1 → GameState (时钟) -->
+    <path d="M880,135 L880,200" stroke="#7b1fa2" stroke-width="2" fill="none" marker-end="url(#arrowBlue)" stroke-dasharray="6,2"/>
+
+    <!-- model2 → model4 -->
+    <path d="M167,295 L167,310" stroke="#2e7d32" stroke-width="2.2" fill="none" marker-end="url(#arrowBlue)"/>
+    <rect x="174" y="298" width="92" height="16" rx="4" fill="#2e7d32" opacity="0.85"/>
+    <text x="220" y="310" text-anchor="middle" fill="#fff" font-size="9">random_col</text>
+
+    <!-- model4 → model5 -->
+    <path d="M265,357 L290,357" stroke="#bf360c" stroke-width="2.2" fill="none" marker-end="url(#arrowBlue)"/>
+    <rect x="268" y="342" width="80" height="16" rx="4" fill="#bf360c" opacity="0.85"/>
+    <text x="308" y="354" text-anchor="middle" fill="#fff" font-size="9">obs_pos</text>
+
+    <!-- model3 → model5 -->
+    <path d="M392,295 L392,310" stroke="#f57f17" stroke-width="2.2" fill="none" marker-end="url(#arrowBlue)"/>
+    <rect x="399" y="298" width="78" height="16" rx="4" fill="#f57f17" opacity="0.85"/>
+    <text x="438" y="310" text-anchor="middle" fill="#fff" font-size="9">car_pos</text>
+
+    <!-- model5 → model6 (collision) -->
+    <path d="M490,357 L515,340" stroke="#d84315" stroke-width="2.8" fill="none" marker-end="url(#arrowBlue)"/>
+    <rect x="486" y="338" width="52" height="16" rx="4" fill="#d84315" opacity="0.9"/>
+    <text x="512" y="350" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">hit</text>
+
+    <!-- model6 → model3 -->
+    <path d="M520,278 L495,270" stroke="#6a1b9a" stroke-width="2" fill="none" marker-end="url(#arrowBlue)"/>
+    <rect x="468" y="258" width="60" height="16" rx="4" fill="#6a1b9a" opacity="0.85"/>
+    <text x="498" y="270" text-anchor="middle" fill="#fff" font-size="9">is_gaming</text>
+
+    <!-- model6 → model4 -->
+    <path d="M520,310 L270,370" stroke="#6a1b9a" stroke-width="2" fill="none" marker-end="url(#arrowBlue)"/>
+    <rect x="360" y="335" width="60" height="16" rx="4" fill="#6a1b9a" opacity="0.85"/>
+    <text x="390" y="347" text-anchor="middle" fill="#fff" font-size="9">is_gaming</text>
+
+    <!-- model6 → model7 -->
+    <path d="M715,297 L740,280" stroke="#6a1b9a" stroke-width="2" fill="none" marker-end="url(#arrowBlue)"/>
+    <rect x="710" y="278" width="40" height="16" rx="4" fill="#6a1b9a" opacity="0.85"/>
+    <text x="730" y="290" text-anchor="middle" fill="#fff" font-size="9">en</text>
+
+    <!-- model4 → model8 -->
+    <path d="M265,370 L740,370" stroke="#2e7d32" stroke-width="1.8" fill="none" marker-end="url(#arrowBlue)"/>
+    <rect x="450" y="358" width="80" height="16" rx="4" fill="#2e7d32" opacity="0.85"/>
+    <text x="490" y="370" text-anchor="middle" fill="#fff" font-size="9">obs_bitmap</text>
+
+    <!-- model3 → model8 -->
+    <path d="M490,260 L740,340" stroke="#f57f17" stroke-width="1.8" fill="none" marker-end="url(#arrowBlue)"/>
+    <rect x="570" y="293" width="70" height="16" rx="4" fill="#f57f17" opacity="0.85"/>
+    <text x="605" y="305" text-anchor="middle" fill="#fff" font-size="9">car_bitmap</text>
+
+    <!-- model7 → model8 -->
+    <path d="M842,310 L842,325" stroke="#00695c" stroke-width="2" fill="none" marker-end="url(#arrowBlue)"/>
+    <rect x="849" y="313" width="56" height="16" rx="4" fill="#00695c" opacity="0.85"/>
+    <text x="877" y="325" text-anchor="middle" fill="#fff" font-size="9">score</text>
+
+    <!-- model6 → GameState -->
+    <path d="M617,345 L617,400 L880,400 L880,140" stroke="#6a1b9a" stroke-width="2.2" fill="none" marker-end="url(#arrowBlue)" stroke-dasharray="7,3"/>
+    <rect x="720" y="388" width="72" height="16" rx="4" fill="#6a1b9a" opacity="0.85"/>
+    <text x="756" y="400" text-anchor="middle" fill="#fff" font-size="9">game_state</text>
+
+    <!-- model8 → LED (外部) -->
+    <rect x="940" y="355" width="70" height="34" rx="6" fill="#37474f"/>
+    <text x="975" y="369" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">LED</text>
+    <text x="975" y="383" text-anchor="middle" fill="#b0bec5" font-size="9">8×8 矩阵</text>
+    <path d="M940,372 L940,372" stroke="#37474f" stroke-width="2"/> <!-- 不可见起点 -->
+    <path d="M940,372 L935,372" stroke="#e65100" stroke-width="2.2" fill="none" marker-end="url(#arrowBlue)"/>
+
+    <!-- 图例 -->
+    <rect x="60" y="430" width="12" height="12" rx="2" fill="url(#gradM6)"/>
+    <text x="78" y="441" fill="#333" font-size="11">核心控制模块</text>
+    <rect x="200" y="430" width="12" height="12" rx="2" fill="url(#gradM1)"/>
+    <text x="218" y="441" fill="#333" font-size="11">时钟模块</text>
+    <rect x="320" y="430" width="12" height="12" rx="2" fill="url(#gradM2)"/>
+    <text x="338" y="441" fill="#333" font-size="11">数据源模块</text>
+    <rect x="460" y="430" width="12" height="12" rx="2" fill="url(#gradM5)"/>
+    <text x="478" y="441" fill="#333" font-size="11">检测模块</text>
+    <rect x="580" y="430" width="12" height="12" rx="2" fill="url(#gradM8)"/>
+    <text x="598" y="441" fill="#333" font-size="11">输出模块</text>
+    <line x1="700" y1="436" x2="740" y2="436" stroke="#1565c0" stroke-width="2.5" stroke-dasharray="6,2"/>
+    <text x="748" y="441" fill="#333" font-size="11">时钟线</text>
+    <line x1="830" y1="436" x2="870" y2="436" stroke="#2b579a" stroke-width="2.5"/>
+    <text x="878" y="441" fill="#333" font-size="11">数据线</text>
+
+  </svg>
+</div>
+
+<!-- ==================== 图2: 信号连接详图 ==================== -->
+<div class="page">
+  <div class="page-title"><span class="num">2</span> 模块信号连接详图（Visio风格）</div>
+  <svg viewBox="0 0 1050 580" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="sh2"><feDropShadow dx="2" dy="2" stdDeviation="2.5" flood-opacity="0.14"/></filter>
+      <marker id="arw" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#444"/>
+      </marker>
+      <marker id="arwRed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#c62828"/>
+      </marker>
+    </defs>
+
+    <pattern id="grid2" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e8e8e8" stroke-width="0.3"/>
+    </pattern>
+    <rect width="1050" height="580" fill="url(#grid2)" opacity="0.6"/>
+
+    <!-- 系统时钟 -->
+    <ellipse cx="190" cy="50" rx="55" ry="22" fill="#37474f"/>
+    <text x="190" y="47" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">系统时钟</text>
+    <text x="190" y="61" text-anchor="middle" fill="#b0bec5" font-size="9">100MHz</text>
+
+    <!-- model1 -->
+    <rect x="105" y="110" width="170" height="70" rx="7" fill="url(#gradM1)" stroke="#1565c0" stroke-width="2" filter="url(#sh2)"/>
+    <text x="190" y="138" text-anchor="middle" fill="#0d47a1" font-size="14" font-weight="bold">model1 时钟分频计</text>
+    <text x="190" y="158" text-anchor="middle" fill="#1565c0" font-size="11">clk → clk_div(多路)</text>
+    <text x="190" y="174" text-anchor="middle" fill="#78909c" font-size="9">~1Hz游戏节拍 / ~1kHz扫描</text>
+
+    <!-- model2 -->
+    <rect x="60" y="250" width="170" height="65" rx="6" fill="url(#gradM2)" stroke="#2e7d32" stroke-width="1.6" filter="url(#sh2)"/>
+    <text x="145" y="276" text-anchor="middle" fill="#1b5e20" font-size="13" font-weight="bold">model2 随机数生成器</text>
+    <text x="145" y="296" text-anchor="middle" fill="#2e7d32" font-size="11">LFSR → random_col[7:0]</text>
+
+    <!-- model3 小车 -->
+    <rect x="280" y="340" width="170" height="65" rx="6" fill="url(#gradM3)" stroke="#f9a825" stroke-width="1.6" filter="url(#sh2)"/>
+    <text x="365" y="366" text-anchor="middle" fill="#e65100" font-size="13" font-weight="bold">model3 小车控制器</text>
+    <text x="365" y="386" text-anchor="middle" fill="#f57f17" font-size="11">按键 → car_row[2:0]</text>
+
+    <!-- model4 -->
+    <rect x="60" y="360" width="170" height="65" rx="6" fill="url(#gradM4)" stroke="#2e7d32" stroke-width="1.6" filter="url(#sh2)"/>
+    <text x="145" y="386" text-anchor="middle" fill="#1b5e20" font-size="13" font-weight="bold">model4 障碍物管理</text>
+    <text x="145" y="406" text-anchor="middle" fill="#2e7d32" font-size="11">移位寄存器 → obs[7:0][7:0]</text>
+
+    <!-- model5 -->
+    <rect x="60" y="470" width="170" height="65" rx="6" fill="url(#gradM5)" stroke="#bf360c" stroke-width="1.6" filter="url(#sh2)"/>
+    <text x="145" y="496" text-anchor="middle" fill="#bf360c" font-size="13" font-weight="bold">model5 碰撞检测</text>
+    <text x="145" y="516" text-anchor="middle" fill="#d84315" font-size="11">比较器 → hit 信号</text>
+
+    <!-- model6 居中 -->
+    <rect x="420" y="240" width="180" height="75" rx="7" fill="url(#gradM6)" stroke="#6a1b9a" stroke-width="2" filter="url(#sh2)"/>
+    <text x="510" y="268" text-anchor="middle" fill="#4a148c" font-size="14" font-weight="bold">model6 游戏状态机</text>
+    <text x="510" y="290" text-anchor="middle" fill="#6a1b9a" font-size="11">FSM: IDLE→GAMING→GAMEOVER</text>
+
+    <!-- model7 -->
+    <rect x="440" y="380" width="160" height="55" rx="6" fill="url(#gradM7)" stroke="#00695c" stroke-width="1.6" filter="url(#sh2)"/>
+    <text x="520" y="403" text-anchor="middle" fill="#004d40" font-size="13" font-weight="bold">model7 计分器</text>
+    <text x="520" y="421" text-anchor="middle" fill="#00695c" font-size="11">score[7:0] 递增</text>
+
+    <!-- model8 -->
+    <rect x="665" y="350" width="175" height="75" rx="7" fill="url(#gradM8)" stroke="#e65100" stroke-width="1.8" filter="url(#sh2)"/>
+    <text x="752" y="378" text-anchor="middle" fill="#bf360c" font-size="13" font-weight="bold">model8 LED矩阵输出源</text>
+    <text x="752" y="400" text-anchor="middle" fill="#e65100" font-size="11">合成画面 → 行/列扫描</text>
+
+    <!-- GameState -->
+    <rect x="665" y="460" width="175" height="65" rx="6" fill="url(#gradGS)" stroke="#7b1fa2" stroke-width="1.6" filter="url(#sh2)"/>
+    <text x="752" y="486" text-anchor="middle" fill="#4a148c" font-size="13" font-weight="bold">GameState 状态显示</text>
+    <text x="752" y="506" text-anchor="middle" fill="#7b1fa2" font-size="11">数码管 / LED指示灯</text>
+
+    <!-- LED 外部 -->
+    <rect x="895" y="360" width="90" height="45" rx="6" fill="#37474f"/>
+    <text x="940" y="379" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">LED</text>
+    <text x="940" y="395" text-anchor="middle" fill="#b0bec5" font-size="10">8×8 矩阵</text>
+
+    <!-- ====== 连线 ====== -->
+
+    <!-- CLK → model1 -->
+    <path d="M190,72 L190,105" stroke="#37474f" stroke-width="2.5" fill="none" marker-end="url(#arw)"/>
+
+    <!-- model1 下行主时钟总线 -->
+    <path d="M190,180 L190,210 L145,210 L145,244" stroke="#1565c0" stroke-width="2" fill="none" marker-end="url(#arw)"/>
+    <path d="M190,180 L190,210 L365,210 L365,334" stroke="#1565c0" stroke-width="2" fill="none" marker-end="url(#arw)"/>
+    <path d="M190,180 L190,215 L510,215 L510,234" stroke="#1565c0" stroke-width="2" fill="none" marker-end="url(#arw)"/>
+    <path d="M190,180 L190,220 L752,220 L752,344" stroke="#1565c0" stroke-width="2" fill="none" marker-end="url(#arw)"/>
+
+    <text x="200" y="208" fill="#1565c0" font-size="10" font-weight="bold">clk_div → 各模块</text>
+
+    <!-- model2 → model4 -->
+    <path d="M145,315 L145,354" stroke="#2e7d32" stroke-width="2.2" fill="none" marker-end="url(#arw)"/>
+    <rect x="70" y="328" width="78" height="16" rx="4" fill="#2e7d32" opacity="0.85"/>
+    <text x="109" y="340" text-anchor="middle" fill="#fff" font-size="9">random_col[7:0]</text>
+
+    <!-- model4 → model5 -->
+    <path d="M145,425 L145,464" stroke="#bf360c" stroke-width="2.2" fill="none" marker-end="url(#arwRed)"/>
+    <rect x="70" y="438" width="74" height="16" rx="4" fill="#bf360c" opacity="0.85"/>
+    <text x="107" y="450" text-anchor="middle" fill="#fff" font-size="9">obs_col[7:0]</text>
+
+    <!-- model3 → model5 -->
+    <path d="M365,405 L365,470 L235,470 L235,500" stroke="#f57f17" stroke-width="2" fill="none" marker-end="url(#arw)"/>
+    <rect x="260" y="458" width="78" height="16" rx="4" fill="#f57f17" opacity="0.85"/>
+    <text x="299" y="470" text-anchor="middle" fill="#fff" font-size="9">car_row[2:0]</text>
+
+    <!-- model5 → model6 (碰撞！) -->
+    <path d="M230,502 L230,530 L510,530 L510,320" stroke="#c62828" stroke-width="2.8" fill="none" marker-end="url(#arwRed)"/>
+    <rect x="320" y="518" width="72" height="16" rx="4" fill="#c62828" opacity="0.9"/>
+    <text x="356" y="530" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">hit 碰撞!</text>
+
+    <!-- model6 → model3 (使能) -->
+    <path d="M420,268 L370,268 L370,340" stroke="#6a1b9a" stroke-width="2" fill="none" marker-end="url(#arw)" stroke-dasharray="5,3"/>
+    <rect x="350" y="295" width="45" height="16" rx="4" fill="#6a1b9a" opacity="0.85"/>
+    <text x="372" y="307" text-anchor="middle" fill="#fff" font-size="9">enable</text>
+
+    <!-- model6 → model4 (使能) -->
+    <path d="M420,300 L300,300 L300,392" stroke="#6a1b9a" stroke-width="2" fill="none" marker-end="url(#arw)" stroke-dasharray="5,3"/>
+    <rect x="326" y="338" width="45" height="16" rx="4" fill="#6a1b9a" opacity="0.85"/>
+    <text x="348" y="350" text-anchor="middle" fill="#fff" font-size="9">enable</text>
+
+    <!-- model6 → model7 -->
+    <path d="M510,315 L510,374" stroke="#6a1b9a" stroke-width="2" fill="none" marker-end="url(#arw)"/>
+    <rect x="517" y="338" width="45" height="16" rx="4" fill="#6a1b9a" opacity="0.85"/>
+    <text x="539" y="350" text-anchor="middle" fill="#fff" font-size="9">enable</text>
+
+    <!-- model6 → GameState -->
+    <path d="M600,277 L630,277 L630,492 L660,492" stroke="#6a1b9a" stroke-width="2" fill="none" marker-end="url(#arw)"/>
+    <rect x="613" y="385" width="45" height="16" rx="4" fill="#6a1b9a" opacity="0.85"/>
+    <text x="635" y="397" text-anchor="middle" fill="#fff" font-size="9">state</text>
+
+    <!-- model4 → model8 -->
+    <path d="M230,392 L660,392" stroke="#2e7d32" stroke-width="2" fill="none" marker-end="url(#arw)"/>
+    <rect x="380" y="380" width="78" height="16" rx="4" fill="#2e7d32" opacity="0.85"/>
+    <text x="419" y="392" text-anchor="middle" fill="#fff" font-size="9">obs_bitmap</text>
+
+    <!-- model3 → model8 -->
+    <path d="M450,375 L530,375 L660,375" stroke="#f57f17" stroke-width="2" fill="none" marker-end="url(#arw)"/>
+    <rect x="545" y="364" width="70" height="16" rx="4" fill="#f57f17" opacity="0.85"/>
+    <text x="580" y="376" text-anchor="middle" fill="#fff" font-size="9">car_bitmap</text>
+
+    <!-- model7 → model8 -->
+    <path d="M600,407 L640,407 L660,400" stroke="#00695c" stroke-width="2" fill="none" marker-end="url(#arw)"/>
+    <rect x="603" y="396" width="56" height="16" rx="4" fill="#00695c" opacity="0.85"/>
+    <text x="631" y="408" text-anchor="middle" fill="#fff" font-size="9">score[7:0]</text>
+
+    <!-- model8 → LED -->
+    <path d="M840,390 L890,390" stroke="#e65100" stroke-width="2.5" fill="none" marker-end="url(#arw)"/>
+    <rect x="850" y="378" width="50" height="16" rx="4" fill="#e65100" opacity="0.85"/>
+    <text x="875" y="390" text-anchor="middle" fill="#fff" font-size="9">扫描信号</text>
+
+  </svg>
+</div>
+
+<!-- ==================== 图3: 系统工作流程图 ==================== -->
+<div class="page">
+  <div class="page-title"><span class="num">3</span> 系统工作流程图</div>
+  <svg viewBox="0 0 1050 600" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="sh3"><feDropShadow dx="2" dy="2" stdDeviation="2.5" flood-opacity="0.12"/></filter>
+      <marker id="a3" markerWidth="9" markerHeight="7" refX="9" refY="3.5" orient="auto">
+        <path d="M0,0 L9,3.5 L0,7 Z" fill="#37474f"/>
+      </marker>
+      <linearGradient id="gStart"><stop offset="0%" stop-color="#43a047"/><stop offset="100%" stop-color="#2e7d32"/></linearGradient>
+      <linearGradient id="gEnd"><stop offset="0%" stop-color="#e53935"/><stop offset="100%" stop-color="#c62828"/></linearGradient>
+      <linearGradient id="gProc"><stop offset="0%" stop-color="#fafafa"/><stop offset="100%" stop-color="#e0e0e0"/></linearGradient>
+      <linearGradient id="gDec"><stop offset="0%" stop-color="#fffde7"/><stop offset="100%" stop-color="#fff9c4"/></linearGradient>
+    </defs>
+
+    <pattern id="grid3" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e8e8e8" stroke-width="0.3"/>
+    </pattern>
+    <rect width="1050" height="600" fill="url(#grid3)" opacity="0.5"/>
+
+    <!-- ====== 节点 ====== -->
+
+    <!-- 开始 -->
+    <rect x="420" y="15" width="150" height="42" rx="21" fill="url(#gStart)" filter="url(#sh3)"/>
+    <text x="495" y="42" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">系统上电 / 复位</text>
+
+    <!-- model1 时钟 -->
+    <rect x="395" y="80" width="200" height="48" rx="8" fill="url(#gProc)" stroke="#1565c0" stroke-width="1.8" filter="url(#sh3)"/>
+    <text x="495" y="102" text-anchor="middle" fill="#0d47a1" font-size="13" font-weight="bold">model1 时钟分频</text>
+    <text x="495" y="119" text-anchor="middle" fill="#546e7a" font-size="10">产生各模块所需时钟</text>
+
+    <!-- 状态机 IDLE -->
+    <rect x="395" y="152" width="200" height="48" rx="8" fill="url(#gradM6)" stroke="#6a1b9a" stroke-width="1.8" filter="url(#sh3)"/>
+    <text x="495" y="174" text-anchor="middle" fill="#4a148c" font-size="13" font-weight="bold">model6 状态机 → IDLE</text>
+    <text x="495" y="191" text-anchor="middle" fill="#6a1b9a" font-size="10">等待玩家按下开始键</text>
+
+    <!-- 判断: 开始? -->
+    <polygon points="495,225 595,270 495,315 395,270" fill="url(#gDec)" stroke="#f9a825" stroke-width="2" filter="url(#sh3)"/>
+    <text x="495" y="267" text-anchor="middle" fill="#e65100" font-size="13" font-weight="bold">start?</text>
+    <text x="495" y="283" text-anchor="middle" fill="#f57f17" font-size="10">玩家按下开始?</text>
+
+    <!-- 否 回到IDLE -->
+    <path d="M395,270 L340,270 L340,176 L390,176" stroke="#e53935" stroke-width="1.8" fill="none" marker-end="url(#a3)" stroke-dasharray="5,3"/>
+    <rect x="320" y="214" width="30" height="16" rx="4" fill="#e53935" opacity="0.85"/>
+    <text x="335" y="226" text-anchor="middle" fill="#fff" font-size="10">否</text>
+
+    <!-- GAMING -->
+    <rect x="395" y="340" width="200" height="48" rx="8" fill="#e8f5e9" stroke="#43a047" stroke-width="1.8" filter="url(#sh3)"/>
+    <text x="495" y="362" text-anchor="middle" fill="#1b5e20" font-size="13" font-weight="bold">状态机 → GAMING</text>
+    <text x="495" y="379" text-anchor="middle" fill="#2e7d32" font-size="10">开始游戏循环</text>
+
+    <!-- 计分清零 -->
+    <rect x="395" y="412" width="200" height="42" rx="8" fill="url(#gradM7)" stroke="#00695c" stroke-width="1.6" filter="url(#sh3)"/>
+    <text x="495" y="434" text-anchor="middle" fill="#004d40" font-size="13">model7 计分器清零</text>
+
+    <!-- 游戏循环体 (大框) -->
+    <rect x="50" y="480" width="950" height="220" rx="10" fill="none" stroke="#e65100" stroke-width="2" stroke-dasharray="8,3"/>
+    <rect x="55" y="484" width="80" height="22" rx="6" fill="#e65100"/>
+    <text x="95" y="500" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">游戏循环体</text>
+
+    <!-- 循环内步骤 -->
+    <rect x="70" y="520" width="140" height="48" rx="7" fill="url(#gradM2)" stroke="#2e7d32" stroke-width="1.4" filter="url(#sh3)"/>
+    <text x="140" y="541" text-anchor="middle" fill="#1b5e20" font-size="11" font-weight="bold">model2 生成</text>
+    <text x="140" y="558" text-anchor="middle" fill="#2e7d32" font-size="10">随机障碍列</text>
+
+    <rect x="245" y="520" width="140" height="48" rx="7" fill="url(#gradM4)" stroke="#2e7d32" stroke-width="1.4" filter="url(#sh3)"/>
+    <text x="315" y="541" text-anchor="middle" fill="#1b5e20" font-size="11" font-weight="bold">model4 左移</text>
+    <text x="315" y="558" text-anchor="middle" fill="#2e7d32" font-size="10">障碍物移位</text>
+
+    <rect x="420" y="520" width="140" height="48" rx="7" fill="url(#gradM3)" stroke="#f9a825" stroke-width="1.4" filter="url(#sh3)"/>
+    <text x="490" y="541" text-anchor="middle" fill="#e65100" font-size="11" font-weight="bold">model3 读取</text>
+    <text x="490" y="558" text-anchor="middle" fill="#f57f17" font-size="10">玩家输入(上/下)</text>
+
+    <rect x="595" y="520" width="140" height="48" rx="7" fill="url(#gradM5)" stroke="#bf360c" stroke-width="1.4" filter="url(#sh3)"/>
+    <text x="665" y="541" text-anchor="middle" fill="#bf360c" font-size="11" font-weight="bold">model5 碰撞检测</text>
+    <text x="665" y="558" text-anchor="middle" fill="#d84315" font-size="10">car vs obstacle</text>
+
+    <rect x="770" y="520" width="110" height="48" rx="7" fill="url(#gradM7)" stroke="#00695c" stroke-width="1.4" filter="url(#sh3)"/>
+    <text x="825" y="541" text-anchor="middle" fill="#004d40" font-size="11" font-weight="bold">model7 计分+1</text>
+    <text x="825" y="558" text-anchor="middle" fill="#00695c" font-size="10">通过一列</text>
+
+    <rect x="770" y="590" width="110" height="48" rx="7" fill="url(#gradM8)" stroke="#e65100" stroke-width="1.4" filter="url(#sh3)"/>
+    <text x="825" y="611" text-anchor="middle" fill="#bf360c" font-size="11" font-weight="bold">model8 刷新</text>
+    <text x="825" y="628" text-anchor="middle" fill="#e65100" font-size="10">LED矩阵显示</text>
+
+    <!-- 碰撞分支判断 -->
+    <polygon points="665,590 730,625 665,660 600,625" fill="url(#gDec)" stroke="#f9a825" stroke-width="1.6" filter="url(#sh3)"/>
+    <text x="665" y="623" text-anchor="middle" fill="#e65100" font-size="11" font-weight="bold">碰撞?</text>
+
+    <!-- 碰撞 → GAMEOVER -->
+    <rect x="50" y="650" width="140" height="42" rx="8" fill="url(#gEnd)" filter="url(#sh3)"/>
+    <text x="120" y="668" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">GAMEOVER</text>
+    <text x="120" y="684" text-anchor="middle" fill="#ffcdd2" font-size="10">游戏结束</text>
+
+    <!-- GameState -->
+    <rect x="50" y="718" width="140" height="42" rx="8" fill="url(#gradGS)" stroke="#7b1fa2" stroke-width="1.6" filter="url(#sh3)"/>
+    <text x="120" y="740" text-anchor="middle" fill="#4a148c" font-size="12" font-weight="bold">GameState</text>
+    <text x="120" y="756" text-anchor="middle" fill="#7b1fa2" font-size="10">显示 GAMEOVER</text>
+
+    <!-- 重新开始? -->
+    <polygon points="120,785 195,815 120,845 45,815" fill="url(#gDec)" stroke="#f9a825" stroke-width="1.6" filter="url(#sh3)"/>
+    <text x="120" y="813" text-anchor="middle" fill="#e65100" font-size="11" font-weight="bold">重新</text>
+    <text x="120" y="828" text-anchor="middle" fill="#e65100" font-size="11" font-weight="bold">开始?</text>
+
+    <!-- ====== 连线 ====== -->
+
+    <!-- 主流程线 -->
+    <path d="M495,57 L495,74" stroke="#37474f" stroke-width="2" fill="none" marker-end="url(#a3)"/>
+    <path d="M495,128 L495,146" stroke="#37474f" stroke-width="2" fill="none" marker-end="url(#a3)"/>
+    <path d="M495,200 L495,219" stroke="#37474f" stroke-width="2" fill="none" marker-end="url(#a3)"/>
+    <path d="M495,315 L495,334" stroke="#37474f" stroke-width="2" fill="none" marker-end="url(#a3)"/>
+    <rect x="565" y="281" width="30" height="16" rx="4" fill="#43a047" opacity="0.85"/>
+    <text x="580" y="293" text-anchor="middle" fill="#fff" font-size="10">是</text>
+
+    <path d="M495,388 L495,406" stroke="#37474f" stroke-width="2" fill="none" marker-end="url(#a3)"/>
+    <path d="M495,454 L140,454 L140,514" stroke="#37474f" stroke-width="2" fill="none" marker-end="url(#a3)"/>
+
+    <!-- 循环内连线 -->
+    <path d="M210,544 L239,544" stroke="#37474f" stroke-width="1.8" fill="none" marker-end="url(#a3)"/>
+    <path d="M385,544 L414,544" stroke="#37474f" stroke-width="1.8" fill="none" marker-end="url(#a3)"/>
+    <path d="M560,544 L589,544" stroke="#37474f" stroke-width="1.8" fill="none" marker-end="url(#a3)"/>
+    <path d="M735,544 L764,544" stroke="#37474f" stroke-width="1.8" fill="none" marker-end="url(#a3)"/>
+
+    <!-- 碰撞分支 -->
+    <path d="M665,588 L665,584" stroke="#37474f" stroke-width="1.8" fill="none"/> <!-- 进入判断 -->
+    <!-- 无碰撞 → 计分 -->
+    <path d="M730,625 L764,625 L764,544" stroke="#37474f" stroke-width="1.8" fill="none"/> <!-- 向右绕行 -->
+    <!-- 这里:右边没有直接连到model7，改为从判断上方进入 -->
+    <!-- 重新布局：无碰撞直接继续游戏循环 -->
+
+    <!-- 碰撞 → GAMEOVER -->
+    <path d="M600,625 L120,625 L120,644" stroke="#c62828" stroke-width="2.5" fill="none" marker-end="url(#a3)"/>
+    <rect x="310" y="613" width="30" height="16" rx="4" fill="#c62828" opacity="0.9"/>
+    <text x="325" y="625" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">是</text>
+
+    <!-- GAMEOVER → GameState -->
+    <path d="M120,692 L120,712" stroke="#7b1fa2" stroke-width="2" fill="none" marker-end="url(#a3)"/>
+
+    <!-- GameState → 重新开始判断 -->
+    <path d="M120,760 L120,779" stroke="#37474f" stroke-width="2" fill="none" marker-end="url(#a3)"/>
+
+    <!-- 重新开始 → 是 回到GAMING -->
+    <path d="M195,815 L290,815 L290,364 L389,364" stroke="#43a047" stroke-width="2" fill="none" marker-end="url(#a3)"/>
+    <rect x="220" y="803" width="30" height="16" rx="4" fill="#43a047" opacity="0.85"/>
+    <text x="235" y="815" text-anchor="middle" fill="#fff" font-size="10">是</text>
+
+    <!-- 重新开始 → 否 停留在GameState -->
+    <path d="M120,845 L120,870 L120,870" stroke="#e53935" stroke-width="1.8" fill="none" marker-end="url(#a3)" stroke-dasharray="5,3"/>
+    <!-- 改为回环 -->
+    <path d="M45,815 L25,815 L25,740 L44,740" stroke="#e53935" stroke-width="1.8" fill="none" marker-end="url(#a3)" stroke-dasharray="5,3"/>
+    <rect x="14" y="775" width="30" height="16" rx="4" fill="#e53935" opacity="0.85"/>
+    <text x="29" y="787" text-anchor="middle" fill="#fff" font-size="10">否</text>
+
+    <!-- 无碰撞 → 刷新LED后循环 -->
+    <path d="M665,660 L665,680 L825,680 L825,644" stroke="#37474f" stroke-width="1.8" fill="none"/>
+    <!-- 无碰撞从model7 → model8 → 循环回model2 -->
+    <path d="M825,680 L825,700 L70,700 L70,544" stroke="#37474f" stroke-width="2" fill="none" marker-end="url(#a3)" stroke-dasharray="6,2"/>
+    <rect x="395" y="688" width="70" height="16" rx="4" fill="#37474f" opacity="0.8"/>
+    <text x="430" y="700" text-anchor="middle" fill="#fff" font-size="10">下一游戏节拍</text>
+
+    <!-- 无碰撞标注 -->
+    <rect x="615" y="648" width="30" height="16" rx="4" fill="#43a047" opacity="0.85"/>
+    <text x="630" y="660" text-anchor="middle" fill="#fff" font-size="10">否</text>
+
+  </svg>
+</div>
+
+<!-- ==================== 图4: 状态机转移图 ==================== -->
+<div class="page">
+  <div class="page-title"><span class="num">4</span> 游戏状态机转移图（model6 FSM）</div>
+  <svg viewBox="0 0 1050 500" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="sh4"><feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.15"/></filter>
+      <marker id="a4" markerWidth="9" markerHeight="7" refX="9" refY="3.5" orient="auto">
+        <path d="M0,0 L9,3.5 L0,7 Z" fill="#444"/>
+      </marker>
+    </defs>
+
+    <pattern id="grid4" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e8e8e8" stroke-width="0.3"/>
+    </pattern>
+    <rect width="1050" height="500" fill="url(#grid4)" opacity="0.5"/>
+
+    <!-- ===== IDLE 状态 ===== -->
+    <rect x="70" y="160" width="220" height="120" rx="14" fill="#e3f2fd" stroke="#1565c0" stroke-width="2.5" filter="url(#sh4)"/>
+    <text x="180" y="195" text-anchor="middle" fill="#0d47a1" font-size="18" font-weight="bold">IDLE</text>
+    <text x="180" y="220" text-anchor="middle" fill="#1565c0" font-size="12">空闲 / 等待开始</text>
+    <line x1="100" y1="235" x2="260" y2="235" stroke="#90caf9" stroke-width="1"/>
+    <text x="180" y="255" text-anchor="middle" fill="#546e7a" font-size="11">输出: is_gaming = 0</text>
+    <text x="180" y="273" text-anchor="middle" fill="#546e7a" font-size="11">所有游戏模块暂停</text>
+
+    <!-- ===== GAMING 状态 ===== -->
+    <rect x="415" y="160" width="220" height="120" rx="14" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2.5" filter="url(#sh4)"/>
+    <text x="525" y="195" text-anchor="middle" fill="#1b5e20" font-size="18" font-weight="bold">GAMING</text>
+    <text x="525" y="220" text-anchor="middle" fill="#2e7d32" font-size="12">游戏中 / 循环运行</text>
+    <line x1="445" y1="235" x2="605" y2="235" stroke="#a5d6a7" stroke-width="1"/>
+    <text x="525" y="255" text-anchor="middle" fill="#546e7a" font-size="11">输出: is_gaming = 1</text>
+    <text x="525" y="273" text-anchor="middle" fill="#546e7a" font-size="11">启用 model2/3/4/5/7/8</text>
+
+    <!-- ===== GAMEOVER 状态 ===== -->
+    <rect x="760" y="160" width="220" height="120" rx="14" fill="#ffebee" stroke="#c62828" stroke-width="2.5" filter="url(#sh4)"/>
+    <text x="870" y="195" text-anchor="middle" fill="#b71c1c" font-size="18" font-weight="bold">GAMEOVER</text>
+    <text x="870" y="220" text-anchor="middle" fill="#c62828" font-size="12">游戏结束 / 等待重启</text>
+    <line x1="790" y1="235" x2="950" y2="235" stroke="#ef9a9a" stroke-width="1"/>
+    <text x="870" y="255" text-anchor="middle" fill="#546e7a" font-size="11">输出: is_gaming = 0</text>
+    <text x="870" y="273" text-anchor="middle" fill="#546e7a" font-size="11">锁定分数显示</text>
+
+    <!-- ===== 转移弧线 ===== -->
+
+    <!-- IDLE → GAMING: start=1 -->
+    <path d="M290,200 C350,180 355,180 410,200" stroke="#43a047" stroke-width="3" fill="none" marker-end="url(#a4)"/>
+    <rect x="310" y="172" width="80" height="20" rx="5" fill="#43a047" opacity="0.9"/>
+    <text x="350" y="186" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">start = 1</text>
+
+    <!-- GAMING → GAMEOVER: collision=1 -->
+    <path d="M635,200 C700,180 700,180 755,200" stroke="#c62828" stroke-width="3" fill="none" marker-end="url(#a4)"/>
+    <rect x="660" y="170" width="90" height="20" rx="5" fill="#c62828" opacity="0.9"/>
+    <text x="705" y="184" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">collision = 1</text>
+
+    <!-- GAMEOVER → IDLE: restart=1 -->
+    <path d="M870,285 C870,350 180,350 180,285" stroke="#1565c0" stroke-width="3" fill="none" marker-end="url(#a4)"/>
+    <rect x="480" y="340" width="90" height="20" rx="5" fill="#1565c0" opacity="0.9"/>
+    <text x="525" y="354" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">restart = 1</text>
+
+    <!-- 初始进入 IDLE -->
+    <ellipse cx="180" cy="115" rx="50" ry="22" fill="#37474f"/>
+    <text x="180" y="112" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">上电/复位</text>
+    <text x="180" y="127" text-anchor="middle" fill="#b0bec5" font-size="9">Power-On Reset</text>
+    <path d="M180,137 L180,154" stroke="#37474f" stroke-width="2.5" fill="none" marker-end="url(#a4)"/>
+
+    <!-- GAMING 内部子状态 (右下) -->
+    <rect x="100" y="400" width="850" height="80" rx="10" fill="none" stroke="#888" stroke-width="1.2" stroke-dasharray="5,3"/>
+    <text x="110" y="418" fill="#888" font-size="10" font-weight="bold">GAMING 状态内部微操作（单拍循环）</text>
+
+    <rect x="100" y="428" width="95" height="36" rx="6" fill="url(#gradM2)" stroke="#2e7d32" stroke-width="1.2"/>
+    <text x="147" y="450" text-anchor="middle" fill="#1b5e20" font-size="10">生成障碍</text>
+    <text x="147" y="460" text-anchor="middle" fill="#1b5e20" font-size="10">model2</text>
+
+    <rect x="225" y="428" width="95" height="36" rx="6" fill="url(#gradM4)" stroke="#2e7d32" stroke-width="1.2"/>
+    <text x="272" y="450" text-anchor="middle" fill="#1b5e20" font-size="10">障碍左移</text>
+    <text x="272" y="460" text-anchor="middle" fill="#1b5e20" font-size="10">model4</text>
+
+    <rect x="350" y="428" width="95" height="36" rx="6" fill="url(#gradM3)" stroke="#f9a825" stroke-width="1.2"/>
+    <text x="397" y="450" text-anchor="middle" fill="#e65100" font-size="10">读取按键</text>
+    <text x="397" y="460" text-anchor="middle" fill="#e65100" font-size="10">model3</text>
+
+    <rect x="475" y="428" width="95" height="36" rx="6" fill="url(#gradM5)" stroke="#bf360c" stroke-width="1.2"/>
+    <text x="522" y="450" text-anchor="middle" fill="#bf360c" font-size="10">碰撞检测</text>
+    <text x="522" y="460" text-anchor="middle" fill="#bf360c" font-size="10">model5</text>
+
+    <rect x="600" y="428" width="95" height="36" rx="6" fill="url(#gradM7)" stroke="#00695c" stroke-width="1.2"/>
+    <text x="647" y="450" text-anchor="middle" fill="#004d40" font-size="10">更新分数</text>
+    <text x="647" y="460" text-anchor="middle" fill="#004d40" font-size="10">model7</text>
+
+    <rect x="725" y="428" width="95" height="36" rx="6" fill="url(#gradM8)" stroke="#e65100" stroke-width="1.2"/>
+    <text x="772" y="450" text-anchor="middle" fill="#bf360c" font-size="10">刷新LED</text>
+    <text x="772" y="460" text-anchor="middle" fill="#bf360c" font-size="10">model8</text>
+
+    <!-- 内部连线 -->
+    <path d="M195,446 L220,446" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a4)"/>
+    <path d="M320,446 L345,446" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a4)"/>
+    <path d="M445,446 L470,446" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a4)"/>
+    <path d="M570,446 L595,446" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a4)"/>
+    <path d="M695,446 L720,446" stroke="#555" stroke-width="1.5" fill="none" marker-end="url(#a4)"/>
+    <path d="M820,446 L855,446" stroke="#c62828" stroke-width="1.8" fill="none" marker-end="url(#a4)" stroke-dasharray="4,2"/>
+
+    <!-- 循环回model2 -->
+    <path d="M855,464 L855,480 L147,480 L147,464" stroke="#555" stroke-width="1.2" fill="none" stroke-dasharray="4,3"/>
+    <text x="500" y="478" text-anchor="middle" fill="#888" font-size="9">下一游戏节拍 (next tick)</text>
+
+  </svg>
+</div>
+
+<!-- ==================== 图5: 数据处理流程图 ==================== -->
+<div class="page">
+  <div class="page-title"><span class="num">5</span> 数据处理流程图（泳道式）</div>
+  <svg viewBox="0 0 1050 580" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="sh5"><feDropShadow dx="2" dy="2" stdDeviation="2" flood-opacity="0.12"/></filter>
+      <marker id="a5" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+      </marker>
+    </defs>
+
+    <!-- 泳道背景 -->
+    <rect x="10" y="10" width="200" height="560" rx="0" fill="#e3f2fd" stroke="#90caf9" stroke-width="1"/>
+    <text x="110" y="35" text-anchor="middle" fill="#0d47a1" font-size="12" font-weight="bold">输入层 Input</text>
+
+    <rect x="215" y="10" width="615" height="560" rx="0" fill="#fff8e1" stroke="#ffe082" stroke-width="1"/>
+    <text x="522" y="35" text-anchor="middle" fill="#e65100" font-size="12" font-weight="bold">处理层 Processing</text>
+
+    <rect x="835" y="10" width="200" height="560" rx="0" fill="#e8f5e9" stroke="#a5d6a7" stroke-width="1"/>
+    <text x="935" y="35" text-anchor="middle" fill="#1b5e20" font-size="12" font-weight="bold">输出层 Output</text>
+
+    <!-- ===== 输入层模块 ===== -->
+    <rect x="30" y="60" width="155" height="48" rx="7" fill="#fff" stroke="#1565c0" stroke-width="1.5" filter="url(#sh5)"/>
+    <text x="107" y="82" text-anchor="middle" fill="#0d47a1" font-size="12" font-weight="bold">系统时钟</text>
+    <text x="107" y="98" text-anchor="middle" fill="#546e7a" font-size="10">CLK 100MHz</text>
+
+    <rect x="30" y="150" width="155" height="48" rx="7" fill="#fff" stroke="#1565c0" stroke-width="1.5" filter="url(#sh5)"/>
+    <text x="107" y="172" text-anchor="middle" fill="#0d47a1" font-size="12" font-weight="bold">玩家按键</text>
+    <text x="107" y="188" text-anchor="middle" fill="#546e7a" font-size="10">BTN_up / BTN_down</text>
+
+    <rect x="30" y="240" width="155" height="48" rx="7" fill="#fff" stroke="#1565c0" stroke-width="1.5" filter="url(#sh5)"/>
+    <text x="107" y="262" text-anchor="middle" fill="#0d47a1" font-size="12" font-weight="bold">复位信号</text>
+    <text x="107" y="278" text-anchor="middle" fill="#546e7a" font-size="10">RST</text>
+
+    <!-- ===== 处理层模块 ===== -->
+
+    <!-- model1 时钟分频 -->
+    <rect x="245" y="60" width="165" height="48" rx="7" fill="url(#gradM1)" stroke="#1565c0" stroke-width="1.5" filter="url(#sh5)"/>
+    <text x="327" y="82" text-anchor="middle" fill="#0d47a1" font-size="12" font-weight="bold">model1 时钟分频</text>
+    <text x="327" y="98" text-anchor="middle" fill="#1565c0" font-size="10">100MHz → 1Hz/10Hz</text>
+
+    <!-- model2 LFSR -->
+    <rect x="245" y="140" width="165" height="48" rx="7" fill="url(#gradM2)" stroke="#2e7d32" stroke-width="1.5" filter="url(#sh5)"/>
+    <text x="327" y="162" text-anchor="middle" fill="#1b5e20" font-size="12" font-weight="bold">model2 LFSR随机数</text>
+    <text x="327" y="178" text-anchor="middle" fill="#2e7d32" font-size="10">随机新列障碍物</text>
+
+    <!-- model4 移位 -->
+    <rect x="245" y="220" width="165" height="48" rx="7" fill="url(#gradM4)" stroke="#2e7d32" stroke-width="1.5" filter="url(#sh5)"/>
+    <text x="327" y="242" text-anchor="middle" fill="#1b5e20" font-size="12" font-weight="bold">model4 移位寄存器</text>
+    <text x="327" y="258" text-anchor="middle" fill="#2e7d32" font-size="10">障碍物逐列左移</text>
+
+    <!-- model3 小车 -->
+    <rect x="460" y="220" width="165" height="48" rx="7" fill="url(#gradM3)" stroke="#f9a825" stroke-width="1.5" filter="url(#sh5)"/>
+    <text x="542" y="242" text-anchor="middle" fill="#e65100" font-size="12" font-weight="bold">model3 位置解码</text>
+    <text x="542" y="258" text-anchor="middle" fill="#f57f17" font-size="10">按键 → 行坐标</text>
+
+    <!-- model5 碰撞 -->
+    <rect x="460" y="300" width="165" height="48" rx="7" fill="url(#gradM5)" stroke="#bf360c" stroke-width="1.5" filter="url(#sh5)"/>
+    <text x="542" y="322" text-anchor="middle" fill="#bf360c" font-size="12" font-weight="bold">model5 比较器</text>
+    <text x="542" y="338" text-anchor="middle" fill="#d84315" font-size="10">car_row vs obs_col</text>
+
+    <!-- model6 FSM -->
+    <rect x="665" y="60" width="150" height="80" rx="7" fill="url(#gradM6)" stroke="#6a1b9a" stroke-width="2" filter="url(#sh5)"/>
+    <text x="740" y="90" text-anchor="middle" fill="#4a148c" font-size="13" font-weight="bold">model6 FSM</text>
+    <text x="740" y="112" text-anchor="middle" fill="#6a1b9a" font-size="10">IDLE→GAMING→</text>
+    <text x="740" y="128" text-anchor="middle" fill="#6a1b9a" font-size="10">GAMEOVER</text>
+
+    <!-- model7 计分 -->
+    <rect x="665" y="170" width="150" height="48" rx="7" fill="url(#gradM7)" stroke="#00695c" stroke-width="1.5" filter="url(#sh5)"/>
+    <text x="740" y="192" text-anchor="middle" fill="#004d40" font-size="12" font-weight="bold">model7 计数器</text>
+    <text x="740" y="208" text-anchor="middle" fill="#00695c" font-size="10">每通过一列 +1</text>
+
+    <!-- model8 LED驱动 -->
+    <rect x="665" y="300" width="150" height="48" rx="7" fill="url(#gradM8)" stroke="#e65100" stroke-width="1.5" filter="url(#sh5)"/>
+    <text x="740" y="322" text-anchor="middle" fill="#bf360c" font-size="12" font-weight="bold">model8 合成+输出</text>
+    <text x="740" y="338" text-anchor="middle" fill="#e65100" font-size="10">位图合成 → 扫描</text>
+
+    <!-- ===== 输出层 ===== -->
+    <rect x="855" y="140" width="160" height="55" rx="7" fill="#37474f" filter="url(#sh5)"/>
+    <text x="935" y="164" text-anchor="middle" fill="#fff" font-size="13" font-weight="bold">LED 8×8 矩阵</text>
+    <text x="935" y="184" text-anchor="middle" fill="#b0bec5" font-size="10">画面显示</text>
+
+    <rect x="855" y="260" width="160" height="55" rx="7" fill="url(#gradGS)" stroke="#7b1fa2" stroke-width="1.5" filter="url(#sh5)"/>
+    <text x="935" y="284" text-anchor="middle" fill="#4a148c" font-size="13" font-weight="bold">GameState 指示</text>
+    <text x="935" y="304" text-anchor="middle" fill="#7b1fa2" font-size="10">数码管/指示灯</text>
+
+    <!-- ===== 数据流连线 ===== -->
+
+    <!-- CLK → model1 -->
+    <path d="M185,84 L239,84" stroke="#1565c0" stroke-width="2" fill="none" marker-end="url(#a5)"/>
+    <!-- model1 → model2/3/4/5/6/7/8 时钟 -->
+    <path d="M410,84 L435,84 L435,130 L327,130 L327,134" stroke="#1565c0" stroke-width="1.5" fill="none" marker-end="url(#a5)" stroke-dasharray="5,2"/>
+    <path d="M410,84 L435,84 L435,244 L460,244" stroke="#1565c0" stroke-width="1.5" fill="none" marker-end="url(#a5)" stroke-dasharray="5,2"/>
+    <path d="M410,84 L435,84 L435,220 L245,220 L245,244" stroke="#1565c0" stroke-width="1.5" fill="none" marker-end="url(#a5)" stroke-dasharray="5,2"/>
+    <path d="M410,84 L659,84" stroke="#1565c0" stroke-width="1.5" fill="none" marker-end="url(#a5)" stroke-dasharray="5,2"/>
+
+    <!-- RST → model6 -->
+    <path d="M185,264 L240,264 L240,100 L659,100" stroke="#c62828" stroke-width="1.8" fill="none" marker-end="url(#a5)"/>
+
+    <!-- BTN → model3 -->
+    <path d="M185,174 L455,174 L455,244 L454,244" stroke="#f57f17" stroke-width="2" fill="none" marker-end="url(#a5)"/>
+
+    <!-- model2 → model4 -->
+    <path d="M327,188 L327,214" stroke="#2e7d32" stroke-width="2" fill="none" marker-end="url(#a5)"/>
+    <rect x="248" y="195" width="78" height="16" rx="4" fill="#2e7d32" opacity="0.85"/>
+    <text x="287" y="207" text-anchor="middle" fill="#fff" font-size="9">new_col[7:0]</text>
+
+    <!-- model4 → model5 -->
+    <path d="M410,244 L454,324" stroke="#bf360c" stroke-width="2" fill="none" marker-end="url(#a5)"/>
+    <rect x="418" y="270" width="74" height="16" rx="4" fill="#bf360c" opacity="0.85"/>
+    <text x="455" y="282" text-anchor="middle" fill="#fff" font-size="9">obs_col[7:0]</text>
+
+    <!-- model3 → model5 -->
+    <path d="M542,268 L542,294" stroke="#f57f17" stroke-width="2" fill="none" marker-end="url(#a5)"/>
+    <rect x="549" y="276" width="78" height="16" rx="4" fill="#f57f17" opacity="0.85"/>
+    <text x="588" y="288" text-anchor="middle" fill="#fff" font-size="9">car_row[2:0]</text>
+
+    <!-- model4 → model8 -->
+    <path d="M410,244 L500,244 L500,200 L740,200 L740,294" stroke="#2e7d32" stroke-width="1.8" fill="none" marker-end="url(#a5)"/>
+    <rect x="460" y="188" width="80" height="16" rx="4" fill="#2e7d32" opacity="0.85"/>
+    <text x="500" y="200" text-anchor="middle" fill="#fff" font-size="9">obs_bitmap</text>
+
+    <!-- model3 → model8 -->
+    <path d="M625,244 L700,244 L700,294" stroke="#f57f17" stroke-width="1.8" fill="none" marker-end="url(#a5)"/>
+    <rect x="630" y="232" width="70" height="16" rx="4" fill="#f57f17" opacity="0.85"/>
+    <text x="665" y="244" text-anchor="middle" fill="#fff" font-size="9">car_bitmap</text>
+
+    <!-- model5 → model6 -->
+    <path d="M625,324 L659,315" stroke="#c62828" stroke-width="2.5" fill="none" marker-end="url(#a5)"/>
+    <rect x="620" y="304" width="50" height="16" rx="4" fill="#c62828" opacity="0.9"/>
+    <text x="645" y="316" text-anchor="middle" fill="#fff" font-size="9">hit</text>
+
+    <!-- model6 → 使能控制 -->
+    <path d="M665,100 L245,100 L245,134" stroke="#6a1b9a" stroke-width="1.5" fill="none" marker-end="url(#a5)" stroke-dasharray="4,3"/>
+    <rect x="300" y="112" width="40" height="14" rx="4" fill="#6a1b9a" opacity="0.85"/>
+    <text x="320" y="122" text-anchor="middle" fill="#fff" font-size="9">en</text>
+
+    <path d="M665,130 L635,130 L635,244 L625,244" stroke="#6a1b9a" stroke-width="1.5" fill="none" marker-end="url(#a5)" stroke-dasharray="4,3"/>
+    <rect x="618" y="182" width="40" height="14" rx="4" fill="#6a1b9a" opacity="0.85"/>
+    <text x="638" y="192" text-anchor="middle" fill="#fff" font-size="9">en</text>
+
+    <path d="M665,115 L660,115 L660,194 L740,194" stroke="#6a1b9a" stroke-width="1.5" fill="none" marker-end="url(#a5)" stroke-dasharray="4,3"/>
+
+    <!-- model7 → model8 -->
+    <path d="M740,218 L740,294" stroke="#00695c" stroke-width="2" fill="none" marker-end="url(#a5)"/>
+    <rect x="747" y="248" width="60" height="16" rx="4" fill="#00695c" opacity="0.85"/>
+    <text x="777" y="260" text-anchor="middle" fill="#fff" font-size="9">score[7:0]</text>
+
+    <!-- model6 → GameState -->
+    <path d="M815,100 L935,100 L935,254" stroke="#6a1b9a" stroke-width="2" fill="none" marker-end="url(#a5)"/>
+    <rect x="870" y="165" width="72" height="16" rx="4" fill="#6a1b9a" opacity="0.85"/>
+    <text x="906" y="177" text-anchor="middle" fill="#fff" font-size="9">game_state</text>
+
+    <!-- model8 → LED -->
+    <path d="M815,324 L849,324" stroke="#e65100" stroke-width="2.5" fill="none" marker-end="url(#a5)"/>
+    <rect x="818" y="312" width="50" height="16" rx="4" fill="#e65100" opacity="0.85"/>
+    <text x="843" y="324" text-anchor="middle" fill="#fff" font-size="9">扫描信号</text>
+
+    <!-- 图例 -->
+    <rect x="30" y="350" width="10" height="10" rx="2" fill="#1565c0"/>
+    <text x="46" y="360" fill="#555" font-size="10">时钟信号</text>
+    <line x1="120" y1="355" x2="150" y2="355" stroke="#2e7d32" stroke-width="2"/>
+    <text x="156" y="360" fill="#555" font-size="10">数据流</text>
+    <line x1="230" y1="355" x2="260" y2="355" stroke="#6a1b9a" stroke-width="1.5" stroke-dasharray="4,3"/>
+    <text x="266" y="360" fill="#555" font-size="10">控制使能</text>
+    <line x1="350" y1="355" x2="380" y2="355" stroke="#c62828" stroke-width="2.5"/>
+    <text x="386" y="360" fill="#555" font-size="10">关键信号</text>
+
+  </svg>
+</div>
+
+</body>
+</html>
