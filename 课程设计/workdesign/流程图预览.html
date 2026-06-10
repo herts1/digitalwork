@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电话查询系统 — 流程图预览</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --card-bg: #ffffff;
+    --text: #2c3e50;
+    --border: #e2e8f0;
+    --accent: #2563eb;
+    --green: #059669;
+    --orange: #d97706;
+    --blue: #3b82f6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 24px;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding: 32px 20px;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+    border-radius: 16px;
+    color: #fff;
+  }
+  .header h1 { font-size: 28px; margin-bottom: 8px; }
+  .header p  { opacity: 0.85; font-size: 14px; }
+  .page-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.04);
+    margin-bottom: 32px;
+    overflow: hidden;
+  }
+  .page-title {
+    padding: 16px 24px;
+    font-size: 18px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .page-title .num {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--accent); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700;
+  }
+  .mermaid-wrap {
+    padding: 24px;
+    overflow-x: auto;
+  }
+  .mermaid-wrap .mermaid { display: flex; justify-content: center; }
+  .legend {
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+    padding: 20px 24px; border-top: 1px solid var(--border);
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .legend-dot  { width: 16px; height: 16px; border-radius: 3px; border: 2px solid; }
+  .legend-dot.start  { background: #d1fae5; border-color: #10b981; border-radius: 8px; }
+  .legend-dot.process{ background: #dbeafe; border-color: #3b82f6; }
+  .legend-dot.decision{ background: #fff7ed; border-color: #f97316; transform: rotate(45deg); border-radius: 2px; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 0 24px; }
+  .footer { text-align: center; padding: 16px; font-size: 12px; color: #94a3b8; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📞 电话通话记录查询系统</h1>
+  <p>基于 phone.c / main.cpp 代码逻辑 | 哈希表 + 链地址 + 开放寻址 | C 语言课程设计</p>
+</div>
+
+<!-- ==================== Page 1 ==================== -->
+<div class="page-card">
+  <div class="page-title">
+    <span class="num">1</span> 主程序流程图 (main 函数执行流程)
+  </div>
+  <div class="mermaid-wrap">
+    <pre class="mermaid">
+flowchart TD
+    A["🏁 程序开始"]
+    B["📂 加载客户数据&lt;br/&gt;load_customers('customers.txt')"]
+    C{"✅ 加载成功?"}
+    E1["❌ 输出错误, 退出"]
+    D["📂 加载通话记录&lt;br/&gt;load_calls('calls.txt')"]
+    F{"✅ 加载成功?"}
+    E2["❌ 输出错误, 退出"]
+    G["📊 统计通话次数&lt;br/&gt;count_calls()"]
+    H["🔧 初始化哈希表&lt;br/&gt;ch_init(phone_ch)&lt;br/&gt;ch_init(name_ch)"]
+    I["📥 遍历客户, 插入哈希表&lt;br/&gt;ch_insert_phone()&lt;br/&gt;ch_insert_name()"]
+    J["📋 显示菜单 print_menu()"]
+    K["⌨️ 读取用户选择"]
+    L{"🔀 choice = ?"}
+    M1["📞 case 1&lt;br/&gt;find_maniac()&lt;br/&gt;查找通话狂人"]
+    M2["🔍 case 2&lt;br/&gt;find_by_name()&lt;br/&gt;按姓名查询"]
+    M3["📱 case 3&lt;br/&gt;find_by_phone()&lt;br/&gt;按手机号查询"]
+    M4["📈 case 4&lt;br/&gt;compare_hash_functions()&lt;br/&gt;比较哈希函数冲突率"]
+    M5["📉 case 5&lt;br/&gt;compare_collision_methods()&lt;br/&gt;比较冲突处理方法ASL"]
+    M0["🚪 case 0&lt;br/&gt;ch_free() 释放资源&lt;br/&gt;程序退出"]
+    MD["⚠️ default&lt;br/&gt;无效输入提示"]
+    LOOP["🔄 循环回菜单"]
+
+    A --> B --> C
+    C -- 否 --> E1
+    C -- 是 --> D --> F
+    F -- 否 --> E2
+    F -- 是 --> G --> H --> I --> J --> K --> L
+    L -- case 1 --> M1
+    L -- case 2 --> M2
+    L -- case 3 --> M3
+    L -- case 4 --> M4
+    L -- case 5 --> M5
+    L -- case 0 --> M0
+    L -- default --> MD
+    M1 --> LOOP
+    M2 --> LOOP
+    M3 --> LOOP
+    M4 --> LOOP
+    M5 --> LOOP
+    MD --> LOOP
+    LOOP -.-> J
+
+    style A  fill:#d1fae5,stroke:#10b981,stroke-width:2px
+    style E1 fill:#fee2e2,stroke:#ef4444,stroke-width:2px
+    style E2 fill:#fee2e2,stroke:#ef4444,stroke-width:2px
+    style M0 fill:#fee2e2,stroke:#ef4444,stroke-width:2px
+    style C  fill:#fff7ed,stroke:#f97316,stroke-width:2px
+    style F  fill:#fff7ed,stroke:#f97316,stroke-width:2px
+    style L  fill:#fff7ed,stroke:#f97316,stroke-width:2px
+    style B  fill:#dbeafe,stroke:#3b82f6,stroke-width:1.5px
+    style D  fill:#dbeafe,stroke:#3b82f6,stroke-width:1.5px
+    style G  fill:#dbeafe,stroke:#3b82f6,stroke-width:1.5px
+    style H  fill:#dbeafe,stroke:#3b82f6,stroke-width:1.5px
+    style I  fill:#dbeafe,stroke:#3b82f6,stroke-width:1.5px
+    style J  fill:#dbeafe,stroke:#3b82f6,stroke-width:1.5px
+    style K  fill:#dbeafe,stroke:#3b82f6,stroke-width:1.5px
+    style M1 fill:#ede9fe,stroke:#8b5cf6,stroke-width:1.5px
+    style M2 fill:#ede9fe,stroke:#8b5cf6,stroke-width:1.5px
+    style M3 fill:#ede9fe,stroke:#8b5cf6,stroke-width:1.5px
+    style M4 fill:#fce7f3,stroke:#ec4899,stroke-width:1.5px
+    style M5 fill:#fce7f3,stroke:#ec4899,stroke-width:1.5px
+    style MD fill:#fef3c7,stroke:#eab308,stroke-width:1.5px
+    style LOOP fill:#e0e7ff,stroke:#6366f1,stroke-width:1.5px,stroke-dasharray:4
+    </pre>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot start"></span> 开始/结束/退出</div>
+    <div class="legend-item"><span class="legend-dot process"></span> 处理步骤</div>
+    <div class="legend-item"><span class="legend-dot decision"></span> 判断分支</div>
+  </div>
+</div>
+
+<!-- ==================== Page 2 ==================== -->
+<div class="page-card">
+  <div class="page-title">
+    <span class="num">2</span> 核心算法详图 (四大核心功能内部逻辑)
+  </div>
+  <div class="mermaid-wrap">
+    <pre class="mermaid">
+flowchart TD
+    subgraph S1["① find_maniac() — 查找通话狂人"]
+      A1["📞 开始"] --> A2["count_calls() 重新统计通话次数"]
+      A2 --> A3["遍历 customers[] 数组&lt;br/&gt;找最大 call_count"]
+      A3 --> A4["输出: 手机号 / 姓名 / 通话次数"]
+      A4 --> A5["返回"]
+    end
+
+    subgraph S2["② find_by_name() — 按姓名查询"]
+      B1["🔍 开始"] --> B2["ch_find_name()&lt;br/&gt;链地址哈希表查找"]
+      B2 --> B3{"找到?"}
+      B3 -- 否 --> B4["输出 'No Info'"]
+      B3 -- 是 --> B5["输出: 姓名/身份证号/手机号&lt;br/&gt;遍历 calls[] 打印通话明细"]
+      B4 --> B6["返回"]
+      B5 --> B7["返回"]
+    end
+
+    subgraph S3["③ compare_hash_functions() — 比较哈希函数冲突率"]
+      C1["📈 开始"] --> C2["build_phone_oa()&lt;br/&gt;分别用除留余数法和折叠法&lt;br/&gt;构建手机号开放寻址哈希表"]
+      C2 --> C3["输出手机号哈希对比:&lt;br/&gt;两种方法的冲突数 & 冲突率"]
+      C3 --> C4["build_name_oa()&lt;br/&gt;分别用两种哈希函数&lt;br/&gt;构建姓名开放寻址哈希表"]
+      C4 --> C5["输出姓名哈希对比:&lt;br/&gt;两种方法的冲突数 & 冲突率"]
+      C5 --> C6["返回"]
+    end
+
+    subgraph S4["④ compare_collision_methods() — 比较冲突处理方法 ASL"]
+      D1["📉 开始"] --> D2["build_phone_oa() + build_phone_ch()&lt;br/&gt;分别用开放寻址(线性探测)&lt;br/&gt;和链地址构建手机号哈希表"]
+      D2 --> D3["输出手机号哈希对比:&lt;br/&gt;线性探测 vs 链地址&lt;br/&gt;总探测数 / ASL值"]
+      D3 --> D4["build_name_oa() + build_name_ch()&lt;br/&gt;分别用两种冲突处理法&lt;br/&gt;构建姓名哈希表"]
+      D4 --> D5["输出姓名哈希对比:&lt;br/&gt;线性探测 vs 链地址&lt;br/&gt;总探测数 / ASL值"]
+      D5 --> D6["ch_free() 释放链地址表"]
+      D6 --> D7["返回"]
+    end
+
+    style A1 fill:#d1fae5,stroke:#10b981
+    style A5 fill:#d1fae5,stroke:#10b981
+    style B1 fill:#d1fae5,stroke:#10b981
+    style B6 fill:#d1fae5,stroke:#10b981
+    style B7 fill:#d1fae5,stroke:#10b981
+    style C1 fill:#d1fae5,stroke:#10b981
+    style C6 fill:#d1fae5,stroke:#10b981
+    style D1 fill:#d1fae5,stroke:#10b981
+    style D7 fill:#d1fae5,stroke:#10b981
+    style B3 fill:#fff7ed,stroke:#f97316
+    style B4 fill:#fee2e2,stroke:#ef4444
+    style S1 fill:#f0f9ff,stroke:#0ea5e9,stroke-width:2px
+    style S2 fill:#f0fdf4,stroke:#22c55e,stroke-width:2px
+    style S3 fill:#fffbeb,stroke:#f59e0b,stroke-width:2px
+    style S4 fill:#fdf2f8,stroke:#ec4899,stroke-width:2px
+    </pre>
+  </div>
+</div>
+
+<!-- ==================== 数据结构 & 哈希函数 ==================== -->
+<div class="page-card">
+  <div class="page-title">
+    <span class="num">📦</span> 核心数据结构 & 哈希函数总览
+  </div>
+  <div style="display:flex; flex-wrap:wrap; gap:24px; padding:24px;">
+    <div style="flex:1; min-width:280px; background:#f8fafc; border-radius:10px; padding:20px; border:1px solid #e2e8f0;">
+      <h3 style="margin-bottom:12px; color:#1e40af;">🗃️ 数据结构</h3>
+      <pre style="font-size:13px; line-height:1.7; background:#1e293b; color:#e2e8f0; padding:16px; border-radius:8px; overflow-x:auto;">
+<span style="color:#facc15;">typedef struct</span> {
+    <span style="color:#93c5fd;">char</span> name[<span style="color:#fb923c;">32</span>];      <span style="color:#6b7280;">// 姓名</span>
+    <span style="color:#93c5fd;">char</span> id[<span style="color:#fb923c;">19</span>];        <span style="color:#6b7280;">// 身份证号</span>
+    <span style="color:#93c5fd;">char</span> phone[<span style="color:#fb923c;">12</span>];     <span style="color:#6b7280;">// 11位手机号</span>
+    <span style="color:#93c5fd;">int</span>  call_count;    <span style="color:#6b7280;">// 通话次数</span>
+} <span style="color:#4ade80;">Customer</span>;
+
+<span style="color:#6b7280;">// 开放寻址哈希槽</span>
+<span style="color:#facc15;">typedef struct</span> {
+    <span style="color:#93c5fd;">int</span> valid;          <span style="color:#6b7280;">// 0=空 1=占用 2=删除</span>
+    <span style="color:#93c5fd;">int</span> cust_idx;       <span style="color:#6b7280;">// customers下标</span>
+} <span style="color:#4ade80;">OASlot</span>;
+
+<span style="color:#6b7280;">// 链地址哈希节点</span>
+<span style="color:#facc15;">typedef struct</span> ChainNode {
+    <span style="color:#93c5fd;">int</span> cust_idx;
+    <span style="color:#facc15;">struct</span> ChainNode *next;
+} <span style="color:#4ade80;">ChainNode</span>;
+      </pre>
+    </div>
+    <div style="flex:1; min-width:280px; background:#f8fafc; border-radius:10px; padding:20px; border:1px solid #e2e8f0;">
+      <h3 style="margin-bottom:12px; color:#b45309;">🔑 哈希函数 (2种)</h3>
+      <table style="width:100%; border-collapse:collapse; font-size:13px;">
+        <thead>
+          <tr style="background:#fffbeb;">
+            <th style="padding:10px; border:1px solid #fde68a; text-align:left;">方法</th>
+            <th style="padding:10px; border:1px solid #fde68a; text-align:left;">手机号</th>
+            <th style="padding:10px; border:1px solid #fde68a; text-align:left;">姓名</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px; border:1px solid #e5e7eb; font-weight:600;">除留余数<br/>HASH_DIV</td>
+            <td style="padding:10px; border:1px solid #e5e7eb;">phone_to_ul(key)<br/>% tableSize</td>
+            <td style="padding:10px; border:1px solid #e5e7eb;">∑(name[i] × 31ⁱ)<br/>% tableSize</td>
+          </tr>
+          <tr>
+            <td style="padding:10px; border:1px solid #e5e7eb; font-weight:600;">折叠法<br/>HASH_FOLD</td>
+            <td style="padding:10px; border:1px solid #e5e7eb;">前3位 + 中4位 + 后4位<br/>→ 取模</td>
+            <td style="padding:10px; border:1px solid #e5e7eb;">每4字节分块求和<br/>→ 取模</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3 style="margin:16px 0 8px; color:#7c3aed;">⚡ 冲突处理方法 (2种)</h3>
+      <table style="width:100%; border-collapse:collapse; font-size:13px;">
+        <tr><td style="padding:8px; border:1px solid #e5e7eb; font-weight:600;">线性探测 开放寻址</td><td style="padding:8px; border:1px solid #e5e7eb;">hash(key) + step → 线性探测下一个空槽</td></tr>
+        <tr><td style="padding:8px; border:1px solid #e5e7eb; font-weight:600;">链地址法</td><td style="padding:8px; border:1px solid #e5e7eb;">同义词用单链表链接在同一桶中</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 系统架构 ==================== -->
+<div class="page-card">
+  <div class="page-title">
+    <span class="num">🏗️</span> 系统架构总览
+  </div>
+  <div class="mermaid-wrap">
+    <pre class="mermaid">
+flowchart LR
+    subgraph DATA["📁 数据层"]
+      F1["customers.txt&lt;br/&gt;(30条客户记录)"]
+      F2["calls.txt&lt;br/&gt;(46条通话记录)"]
+    end
+
+    subgraph LOAD["📥 加载层"]
+      L1["load_customers()"] --> CUST["customers[]&lt;br/&gt;Customer数组"]
+      L2["load_calls()"] --> CALL["call_from[][]&lt;br/&gt;call_to[][]"]
+    end
+
+    subgraph HASH["🔐 哈希索引层"]
+      H1["phone_ch[]&lt;br/&gt;链地址(手机号)"]
+      H2["name_ch[]&lt;br/&gt;链地址(姓名)"]
+      H3["phone_oa[]&lt;br/&gt;开放寻址(手机号)"]
+      H4["name_oa[]&lt;br/&gt;开放寻址(姓名)"]
+    end
+
+    subgraph QUERY["🔍 查询层"]
+      Q1["find_maniac()"]
+      Q2["find_by_name()"]
+      Q3["find_by_phone()"]
+    end
+
+    subgraph ANALYZE["📊 分析层"]
+      AN1["compare_hash_functions()&lt;br/&gt;冲突率对比"]
+      AN2["compare_collision_methods()&lt;br/&gt;ASL对比"]
+    end
+
+    F1 --> L1
+    F2 --> L2
+    CUST --> H1
+    CUST --> H2
+    CUST --> H3
+    CUST --> H4
+    H2 --> Q2
+    H1 --> Q3
+    CUST --> Q1
+    CALL --> Q1
+    H3 --> AN1
+    H4 --> AN1
+    H1 --> AN2
+    H3 --> AN2
+
+    style DATA fill:#f0f9ff,stroke:#0ea5e9
+    style LOAD fill:#f0fdf4,stroke:#22c55e
+    style HASH fill:#fffbeb,stroke:#f59e0b
+    style QUERY fill:#fdf2f8,stroke:#ec4899
+    style ANALYZE fill:#f5f3ff,stroke:#8b5cf6
+    </pre>
+  </div>
+</div>
+
+<div class="footer">
+  电话通话记录查询系统 — 流程图预览 | 基于 C 语言课程设计代码生成 | 2026
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    flowchart: {
+      useMaxWidth: true,
+      htmlLabels: true,
+      curve: 'basis',
+      padding: 16,
+    },
+    securityLevel: 'loose',
+  });
+</script>
+</body>
+</html>
